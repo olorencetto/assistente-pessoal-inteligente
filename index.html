@@ -105,6 +105,23 @@
     padding: 6px 14px; font-size: 13px; color: var(--muted);
   }
   .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .search-row input {
+    flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border);
+    font-size: 14px; background: var(--card);
+  }
+  .search-row input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .mic-btn {
+    width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--card); display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .mic-btn.listening { background: var(--danger); border-color: var(--danger); color: #fff; }
+  .search-result-chip {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 10px; padding: 8px 12px;
+    font-size: 13px; margin-bottom: 14px;
+  }
+  .search-result-chip .clear-search { background: none; color: var(--muted); font-size: 12px; text-decoration: underline; padding: 0; }
   a { color: inherit; }
 </style>
 </head>
@@ -133,6 +150,10 @@ let state = {
   tasks: [],
   history: [],
   historyFilter: "semana",
+  historySearchText: "",
+  historySearchResult: null, // { data_inicio, data_fim, descricao }
+  historySearching: false,
+  historyListening: false,
   loadingTasks: false,
   submitting: false,
   toast: null,
@@ -248,6 +269,57 @@ async function enviarTarefa(texto) {
     setState({ toast: `Erro: ${e.message}`, submitting: false });
     setTimeout(() => setState({ toast: null }), 5000);
   }
+}
+
+async function buscarPeriodoPorPergunta(pergunta) {
+  setState({ historySearching: true });
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/interpretar-periodo`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${state.session.access_token}`,
+      },
+      body: JSON.stringify({ pergunta }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || "Erro ao interpretar período");
+    if (data.entendido === false) {
+      setState({ historySearching: false, toast: "Não entendi esse período. Tenta de outro jeito?" });
+      setTimeout(() => setState({ toast: null }), 4000);
+      return;
+    }
+    setState({ historySearching: false, historySearchResult: data });
+  } catch (e) {
+    setState({ historySearching: false, toast: `Erro: ${e.message}` });
+    setTimeout(() => setState({ toast: null }), 4000);
+  }
+}
+
+function getSpeechRecognition() {
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+function iniciarEscutaHistorico() {
+  const SpeechRecognition = getSpeechRecognition();
+  if (!SpeechRecognition) {
+    setState({ toast: "Seu navegador não suporta busca por voz. Digite a pergunta no campo." });
+    setTimeout(() => setState({ toast: null }), 4000);
+    return;
+  }
+  const rec = new SpeechRecognition();
+  rec.lang = "pt-BR";
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  rec.onstart = () => setState({ historyListening: true });
+  rec.onerror = () => setState({ historyListening: false });
+  rec.onend = () => setState({ historyListening: false });
+  rec.onresult = (event) => {
+    const texto = event.results[0][0].transcript;
+    setState({ historySearchText: texto });
+    buscarPeriodoPorPergunta(texto);
+  };
+  rec.start();
 }
 
 function renderLogin() {
@@ -370,21 +442,74 @@ function filtrarHistorico(history, filtro) {
   return history.filter((h) => new Date(h.created_at) >= inicio);
 }
 
+function filtrarPorIntervalo(history, dataInicio, dataFim) {
+  // dataInicio/dataFim no formato YYYY-MM-DD, interpretados como dias no fuso America/Sao_Paulo.
+  const inicio = new Date(`${dataInicio}T00:00:00-03:00`);
+  const fim = new Date(`${dataFim}T23:59:59-03:00`);
+  return history.filter((h) => {
+    const d = new Date(h.created_at);
+    return d >= inicio && d <= fim;
+  });
+}
+
 function renderHistory() {
   const frag = document.createDocumentFragment();
 
-  const filterRow = document.createElement("div");
-  filterRow.className = "filter-row";
-  [["hoje", "Hoje"], ["semana", "Esta semana"], ["tudo", "Tudo"]].forEach(([key, label]) => {
-    const chip = document.createElement("button");
-    chip.className = "filter-chip" + (state.historyFilter === key ? " active" : "");
-    chip.textContent = label;
-    chip.onclick = () => setState({ historyFilter: key });
-    filterRow.appendChild(chip);
-  });
-  frag.appendChild(filterRow);
+  const searchRow = document.createElement("div");
+  searchRow.className = "search-row";
+  const searchInput = document.createElement("input");
+  searchInput.placeholder = "Pergunte, ex: \"o que eu fiz na quinta passada?\"";
+  searchInput.autocomplete = "off";
+  searchInput.value = state.historySearchText;
+  searchInput.oninput = (e) => { state.historySearchText = e.target.value; };
+  const submitSearch = () => {
+    const pergunta = searchInput.value.trim();
+    if (!pergunta || state.historySearching) return;
+    buscarPeriodoPorPergunta(pergunta);
+  };
+  searchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") submitSearch(); });
+  const micBtn = document.createElement("button");
+  micBtn.className = "mic-btn" + (state.historyListening ? " listening" : "");
+  micBtn.title = "Perguntar por voz";
+  micBtn.textContent = state.historyListening ? "●" : "🎤";
+  micBtn.onclick = iniciarEscutaHistorico;
+  searchRow.appendChild(searchInput);
+  searchRow.appendChild(micBtn);
+  frag.appendChild(searchRow);
 
-  const itens = filtrarHistorico(state.history, state.historyFilter);
+  if (state.historySearching) {
+    const thinking = document.createElement("div");
+    thinking.className = "thinking";
+    thinking.textContent = "Entendendo o período perguntado...";
+    frag.appendChild(thinking);
+  }
+
+  if (state.historySearchResult) {
+    const chip = document.createElement("div");
+    chip.className = "search-result-chip";
+    chip.innerHTML = `<span>Mostrando: <strong>${escapeHtml(state.historySearchResult.descricao)}</strong></span>`;
+    const clearBtn = document.createElement("button");
+    clearBtn.className = "clear-search";
+    clearBtn.textContent = "limpar";
+    clearBtn.onclick = () => setState({ historySearchResult: null, historySearchText: "" });
+    chip.appendChild(clearBtn);
+    frag.appendChild(chip);
+  } else {
+    const filterRow = document.createElement("div");
+    filterRow.className = "filter-row";
+    [["hoje", "Hoje"], ["semana", "Esta semana"], ["tudo", "Tudo"]].forEach(([key, label]) => {
+      const chip = document.createElement("button");
+      chip.className = "filter-chip" + (state.historyFilter === key ? " active" : "");
+      chip.textContent = label;
+      chip.onclick = () => setState({ historyFilter: key });
+      filterRow.appendChild(chip);
+    });
+    frag.appendChild(filterRow);
+  }
+
+  const itens = state.historySearchResult
+    ? filtrarPorIntervalo(state.history, state.historySearchResult.data_inicio, state.historySearchResult.data_fim)
+    : filtrarHistorico(state.history, state.historyFilter);
 
   if (itens.length === 0) {
     const p = document.createElement("div");
