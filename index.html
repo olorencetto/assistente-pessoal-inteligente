@@ -97,6 +97,14 @@
   .history-item:last-child { border-bottom: none; }
   .history-item .when { font-size: 12px; color: var(--muted); }
   .history-item .what { font-size: 14px; margin-top: 2px; }
+  .history-day-header { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 6px; }
+  .history-day-header:first-child { margin-top: 0; }
+  .filter-row { display: flex; gap: 6px; margin-bottom: 14px; }
+  .filter-chip {
+    background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+    padding: 6px 14px; font-size: 13px; color: var(--muted);
+  }
+  .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
   a { color: inherit; }
 </style>
 </head>
@@ -124,6 +132,7 @@ let state = {
   tab: "home",
   tasks: [],
   history: [],
+  historyFilter: "semana",
   loadingTasks: false,
   submitting: false,
   toast: null,
@@ -197,7 +206,7 @@ async function loadHistory() {
     .from("history")
     .select("*")
     .order("created_at", { ascending: false })
-    .limit(50);
+    .limit(200);
   if (error) console.error(error);
   setState({ history: data || [] });
 }
@@ -336,24 +345,74 @@ function renderHome() {
   return frag;
 }
 
+function startOfDaySP(d) {
+  // Meia-noite do dia de `d`, no fuso America/Sao_Paulo, como instante UTC comparável.
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(d);
+  return new Date(`${parts}T00:00:00-03:00`);
+}
+
+function dayLabelSP(d) {
+  const hoje = startOfDaySP(new Date());
+  const dia = startOfDaySP(d);
+  const diffDias = Math.round((hoje - dia) / 86400000);
+  if (diffDias === 0) return "Hoje";
+  if (diffDias === 1) return "Ontem";
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", timeZone: "America/Sao_Paulo" });
+}
+
+function filtrarHistorico(history, filtro) {
+  if (filtro === "tudo") return history;
+  const agora = new Date();
+  const limiteDias = filtro === "hoje" ? 0 : 6; // "semana" = hoje + 6 dias anteriores
+  const inicio = new Date(startOfDaySP(agora).getTime() - limiteDias * 86400000);
+  return history.filter((h) => new Date(h.created_at) >= inicio);
+}
+
 function renderHistory() {
   const frag = document.createDocumentFragment();
-  if (state.history.length === 0) {
+
+  const filterRow = document.createElement("div");
+  filterRow.className = "filter-row";
+  [["hoje", "Hoje"], ["semana", "Esta semana"], ["tudo", "Tudo"]].forEach(([key, label]) => {
+    const chip = document.createElement("button");
+    chip.className = "filter-chip" + (state.historyFilter === key ? " active" : "");
+    chip.textContent = label;
+    chip.onclick = () => setState({ historyFilter: key });
+    filterRow.appendChild(chip);
+  });
+  frag.appendChild(filterRow);
+
+  const itens = filtrarHistorico(state.history, state.historyFilter);
+
+  if (itens.length === 0) {
     const p = document.createElement("div");
     p.className = "empty";
-    p.textContent = "Ainda não há histórico.";
+    p.textContent = "Nada por aqui neste período.";
     frag.appendChild(p);
     return frag;
   }
+
   const card = document.createElement("div");
   card.className = "card";
-  state.history.forEach((h) => {
+  let ultimoDia = null;
+  itens.forEach((h) => {
+    const data = new Date(h.created_at);
+    const rotuloDia = dayLabelSP(data);
+    if (rotuloDia !== ultimoDia) {
+      const header = document.createElement("div");
+      header.className = "history-day-header";
+      header.textContent = rotuloDia;
+      card.appendChild(header);
+      ultimoDia = rotuloDia;
+    }
     const item = document.createElement("div");
     item.className = "history-item";
-    const when = new Date(h.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+    const hora = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
     const titulo = h.details?.titulo || h.details?.tarefa?.titulo || h.details?.tarefa?.title || "";
     const acaoLabel = { criada: "Criada", concluida: "Concluída", remarcada: "Remarcada", excluida: "Excluída" }[h.action] || h.action;
-    item.innerHTML = `<div class="when">${when}</div><div class="what"><strong>${acaoLabel}</strong>${titulo ? ": " + escapeHtml(titulo) : ""}</div>`;
+    item.innerHTML = `<div class="when">${hora}</div><div class="what"><strong>${acaoLabel}</strong>${titulo ? ": " + escapeHtml(titulo) : ""}</div>`;
     card.appendChild(item);
   });
   frag.appendChild(card);
