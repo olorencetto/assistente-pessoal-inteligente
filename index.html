@@ -42,6 +42,10 @@
   .btn-secondary {
     background: transparent; color: var(--muted); padding: 8px 12px; font-size: 13px; border: 1px solid var(--border);
   }
+  .btn-danger {
+    background: #fdecea; color: var(--danger); padding: 10px 16px; font-size: 14px; font-weight: 600;
+    border: 1px solid #f5c6c2;
+  }
   .login-screen {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     min-height: 70vh; text-align: center; gap: 16px;
@@ -63,10 +67,10 @@
     font-size: 15px; background: var(--card);
   }
   .input-row input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-  .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .tabs { display: flex; gap: 2px; margin-bottom: 16px; border-bottom: 1px solid var(--border); overflow-x: auto; }
   .tab {
-    background: none; padding: 10px 14px; font-size: 14px; color: var(--muted); font-weight: 500;
-    border-bottom: 2px solid transparent;
+    background: none; padding: 10px 10px; font-size: 13px; color: var(--muted); font-weight: 500;
+    border-bottom: 2px solid transparent; white-space: nowrap; flex-shrink: 0;
   }
   .tab.active { color: var(--text); border-bottom-color: var(--accent); }
   .task { display: flex; align-items: flex-start; gap: 12px; }
@@ -79,6 +83,7 @@
     background: #f1f1f3; color: var(--muted);
   }
   .badge.high { background: #fdecea; color: var(--danger); }
+  .badge.low-conf { background: #fff7e0; color: #93650a; }
   .task .cal-link { font-size: 12px; color: var(--work); text-decoration: none; }
   .task .done-btn {
     background: none; border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px;
@@ -99,7 +104,13 @@
   .history-item .what { font-size: 14px; margin-top: 2px; }
   .history-day-header { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 6px; }
   .history-day-header:first-child { margin-top: 0; }
-  .filter-row { display: flex; gap: 6px; margin-bottom: 14px; }
+  .section-header {
+    font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;
+    margin: 20px 0 8px; display: flex; align-items: center; gap: 6px;
+  }
+  .section-header:first-child { margin-top: 0; }
+  .section-header .count { background: var(--border); color: var(--muted); border-radius: 999px; padding: 1px 7px; font-size: 11px; }
+  .filter-row { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
   .filter-chip {
     background: var(--card); border: 1px solid var(--border); border-radius: 999px;
     padding: 6px 14px; font-size: 13px; color: var(--muted);
@@ -123,6 +134,41 @@
   }
   .search-result-chip .clear-search { background: none; color: var(--muted); font-size: 12px; text-decoration: underline; padding: 0; }
   a { color: inherit; }
+
+  /* Hoje */
+  .greeting { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+  .greeting-sub { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+  .progress-card { display: flex; align-items: center; justify-content: space-between; }
+  .progress-card .num { font-size: 26px; font-weight: 700; }
+  .progress-card .label { font-size: 13px; color: var(--muted); }
+  .resumo-card { background: #111827; color: #fff; }
+  .resumo-card .tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.7; margin-bottom: 6px; }
+  .resumo-card p { margin: 0; font-size: 15px; line-height: 1.4; }
+
+  /* Chat */
+  .chat-scroll { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .bubble { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.4; }
+  .bubble.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+  .bubble.assistant { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+  .task-card-mini { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; align-self: flex-start; max-width: 90%; }
+  .task-card-mini .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .task-card-mini .meta { font-size: 12px; color: var(--muted); display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .task-card-mini .actions { display: flex; gap: 8px; }
+  .undo-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: 5px 12px; font-size: 12px; border-radius: 8px; }
+  .undo-btn.undone { color: var(--danger); border-color: #f5c6c2; }
+  .chat-empty { text-align: center; color: var(--muted); padding: 30px 16px; font-size: 14px; }
+  .chat-input-row { display: flex; gap: 8px; position: sticky; bottom: 12px; }
+  .chat-input-row input {
+    flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
+    font-size: 15px; background: var(--card); box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  /* Ajustes */
+  .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row .label { color: var(--text); }
+  .settings-row .value { color: var(--muted); font-size: 13px; }
+  .danger-zone-title { font-size: 13px; font-weight: 700; color: var(--danger); margin: 4px 0 10px; }
 </style>
 </head>
 <body>
@@ -142,11 +188,18 @@ const CATS = {
   personal: { label: "Pessoal", color: "var(--personal)" },
 };
 const PRIO_LABEL = { low: "baixa", medium: "média", high: "alta" };
+const TABS = [
+  ["hoje", "Hoje"],
+  ["chat", "Chat"],
+  ["agenda", "Agenda"],
+  ["history", "Histórico"],
+  ["settings", "Ajustes"],
+];
 
 const app = document.getElementById("app");
 let state = {
   session: null,
-  tab: "home",
+  tab: "hoje",
   tasks: [],
   history: [],
   historyFilter: "semana",
@@ -158,6 +211,12 @@ let state = {
   loadingTasks: false,
   submitting: false,
   toast: null,
+  resumo: null,
+  resumoLoading: false,
+  chatMessages: [], // { role: 'user'|'assistant', text, taskCard?: {...}, undone?: bool }
+  agendaFilter: "todas",
+  confirmDeleteAccount: false,
+  deletingAccount: false,
 };
 
 function setState(patch) {
@@ -233,6 +292,23 @@ async function loadHistory() {
   setState({ history: data || [] });
 }
 
+async function loadResumo() {
+  setState({ resumoLoading: true });
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/gerar-resumo`, {
+      method: "POST",
+      headers: { "content-type": "application/json", Authorization: `Bearer ${state.session.access_token}` },
+      body: JSON.stringify({}),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || "Erro ao gerar resumo");
+    setState({ resumo: data, resumoLoading: false });
+  } catch (e) {
+    console.error("Erro ao gerar resumo:", e);
+    setState({ resumo: null, resumoLoading: false });
+  }
+}
+
 async function marcarConcluida(task) {
   const { error } = await supabase.from("tasks").update({ status: "done" }).eq("id", task.id);
   if (!error) {
@@ -242,12 +318,13 @@ async function marcarConcluida(task) {
       action: "concluida",
       details: { titulo: task.title },
     });
-    loadTasks();
+    await loadTasks();
+    loadResumo();
   }
 }
 
 async function enviarTarefa(texto) {
-  setState({ submitting: true });
+  setState({ submitting: true, chatMessages: [...state.chatMessages, { role: "user", text: texto }] });
   try {
     const resp = await fetch(`${SUPABASE_URL}/functions/v1/processar-tarefa`, {
       method: "POST",
@@ -260,15 +337,76 @@ async function enviarTarefa(texto) {
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || "Erro ao processar tarefa");
 
-    let msg = `Tarefa criada: "${data.tarefa.title}"`;
-    if (data.calendar_status === "criado") msg += " — evento adicionado ao Google Calendar.";
-    else if (data.calendar_status === "erro") msg += " — não consegui criar o evento no Calendar (verifique a conexão).";
-    setState({ toast: msg, submitting: false });
+    let calText = "";
+    if (data.calendar_status === "criado") calText = "Evento adicionado ao Google Calendar.";
+    else if (data.calendar_status === "erro") calText = "Não consegui criar o evento no Calendar.";
+
+    const assistantMsg = {
+      role: "assistant",
+      text: calText || "Tarefa criada.",
+      taskCard: {
+        id: data.tarefa.id,
+        title: data.tarefa.title,
+        due_at: data.tarefa.due_at,
+        category: data.tarefa.category,
+        priority: data.tarefa.priority,
+        confianca: data.confianca,
+        google_event_link: data.google_event_link,
+      },
+    };
+    setState({ submitting: false, chatMessages: [...state.chatMessages, assistantMsg] });
     await loadTasks();
-    setTimeout(() => setState({ toast: null }), 5000);
+    loadResumo();
   } catch (e) {
-    setState({ toast: `Erro: ${e.message}`, submitting: false });
-    setTimeout(() => setState({ toast: null }), 5000);
+    setState({
+      submitting: false,
+      chatMessages: [...state.chatMessages, { role: "assistant", text: `Erro: ${e.message}` }],
+    });
+  }
+}
+
+async function desfazerTarefa(taskId, msgIndex) {
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/desfazer-tarefa`, {
+      method: "POST",
+      headers: { "content-type": "application/json", Authorization: `Bearer ${state.session.access_token}` },
+      body: JSON.stringify({ task_id: taskId }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || "Erro ao desfazer");
+    const chatMessages = state.chatMessages.map((m, i) =>
+      i === msgIndex ? { ...m, undone: true } : m
+    );
+    setState({ chatMessages, toast: "Tarefa desfeita." });
+    await loadTasks();
+    loadResumo();
+    setTimeout(() => setState({ toast: null }), 3000);
+  } catch (e) {
+    setState({ toast: `Erro: ${e.message}` });
+    setTimeout(() => setState({ toast: null }), 4000);
+  }
+}
+
+async function excluirConta() {
+  setState({ deletingAccount: true });
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/excluir-conta`, {
+      method: "POST",
+      headers: { "content-type": "application/json", Authorization: `Bearer ${state.session.access_token}` },
+      body: JSON.stringify({}),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || "Erro ao excluir conta");
+    await supabase.auth.signOut();
+    setState({
+      session: null, tasks: [], history: [], resumo: null, chatMessages: [],
+      confirmDeleteAccount: false, deletingAccount: false,
+      toast: "Conta e dados excluídos.",
+    });
+    setTimeout(() => setState({ toast: null }), 4000);
+  } catch (e) {
+    setState({ deletingAccount: false, toast: `Erro: ${e.message}` });
+    setTimeout(() => setState({ toast: null }), 4000);
   }
 }
 
@@ -361,6 +499,12 @@ function renderLogin() {
   return div;
 }
 
+function escapeHtml(s) {
+  const d = document.createElement("div");
+  d.textContent = s || "";
+  return d.innerHTML;
+}
+
 function renderTaskRow(task) {
   const cat = CATS[task.category] || CATS.personal;
   const row = document.createElement("div");
@@ -385,32 +529,179 @@ function renderTaskRow(task) {
   return row;
 }
 
-function escapeHtml(s) {
-  const d = document.createElement("div");
-  d.textContent = s || "";
-  return d.innerHTML;
+function startOfDaySP(d) {
+  // Meia-noite do dia de `d`, no fuso America/Sao_Paulo, como instante UTC comparável.
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(d);
+  return new Date(`${parts}T00:00:00-03:00`);
 }
 
-function renderHome() {
+function horaSP(d) {
+  return parseInt(new Intl.DateTimeFormat("en-US", { timeZone: "America/Sao_Paulo", hour: "2-digit", hour12: false }).format(d), 10);
+}
+
+function periodoDoDia(hora) {
+  if (hora < 12) return "Manhã";
+  if (hora < 18) return "Tarde";
+  return "Noite";
+}
+
+function dayLabelSP(d) {
+  const hoje = startOfDaySP(new Date());
+  const dia = startOfDaySP(d);
+  const diffDias = Math.round((hoje - dia) / 86400000);
+  if (diffDias === 0) return "Hoje";
+  if (diffDias === 1) return "Amanhã";
+  if (diffDias === -1) return "Ontem";
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", timeZone: "America/Sao_Paulo" });
+}
+
+function saudacao() {
+  const hora = horaSP(new Date());
+  if (hora < 12) return "Bom dia";
+  if (hora < 18) return "Boa tarde";
+  return "Boa noite";
+}
+
+function renderHoje() {
+  const frag = document.createDocumentFragment();
+  const agora = new Date();
+  const inicioHoje = startOfDaySP(agora);
+  const inicioAmanha = new Date(inicioHoje.getTime() + 86400000);
+
+  const nome = (state.session.user.user_metadata?.full_name || state.session.user.email || "").split(" ")[0].split("@")[0];
+  const greetingWrap = document.createElement("div");
+  greetingWrap.innerHTML = `
+    <div class="greeting">${saudacao()}${nome ? ", " + escapeHtml(nome) : ""}</div>
+    <div class="greeting-sub">${agora.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", timeZone: "America/Sao_Paulo" })}</div>
+  `;
+  frag.appendChild(greetingWrap);
+
+  const tarefasHoje = state.tasks.filter((t) => {
+    const d = new Date(t.due_at);
+    return d >= inicioHoje && d < inicioAmanha;
+  });
+  const atrasadas = state.tasks.filter((t) => new Date(t.due_at) < inicioHoje);
+  const totalHoje = tarefasHoje.length + (state.resumo?.feitasHoje || 0) - tarefasHoje.filter((t) => t.status === "done").length;
+  const feitasHoje = state.resumo?.feitasHoje ?? 0;
+
+  const progressCard = document.createElement("div");
+  progressCard.className = "card progress-card";
+  progressCard.innerHTML = `
+    <div>
+      <div class="num">${feitasHoje}/${state.resumo?.totalHoje ?? tarefasHoje.length + feitasHoje}</div>
+      <div class="label">tarefas concluídas hoje</div>
+    </div>
+  `;
+  frag.appendChild(progressCard);
+
+  const resumoCard = document.createElement("div");
+  resumoCard.className = "card resumo-card";
+  if (state.resumoLoading) {
+    resumoCard.innerHTML = `<div class="tag">Resumo do dia</div><p>Gerando seu resumo...</p>`;
+  } else if (state.resumo) {
+    resumoCard.innerHTML = `<div class="tag">Resumo do dia</div><p>${escapeHtml(state.resumo.texto)}</p>`;
+  } else {
+    resumoCard.innerHTML = `<div class="tag">Resumo do dia</div><p>Não foi possível gerar o resumo agora.</p>`;
+  }
+  frag.appendChild(resumoCard);
+
+  if (atrasadas.length > 0) {
+    const h = document.createElement("div");
+    h.className = "section-header";
+    h.innerHTML = `Atrasadas <span class="count">${atrasadas.length}</span>`;
+    frag.appendChild(h);
+    atrasadas.forEach((t) => frag.appendChild(renderTaskRow(t)));
+  }
+
+  const grupos = { "Manhã": [], "Tarde": [], "Noite": [] };
+  tarefasHoje.forEach((t) => grupos[periodoDoDia(horaSP(new Date(t.due_at)))].push(t));
+
+  ["Manhã", "Tarde", "Noite"].forEach((periodo) => {
+    if (grupos[periodo].length === 0) return;
+    const h = document.createElement("div");
+    h.className = "section-header";
+    h.innerHTML = `${periodo} <span class="count">${grupos[periodo].length}</span>`;
+    frag.appendChild(h);
+    grupos[periodo].forEach((t) => frag.appendChild(renderTaskRow(t)));
+  });
+
+  if (atrasadas.length === 0 && tarefasHoje.length === 0) {
+    const p = document.createElement("div");
+    p.className = "empty";
+    p.textContent = "Nenhuma tarefa para hoje. Use a aba Chat para adicionar algo.";
+    frag.appendChild(p);
+  }
+
+  return frag;
+}
+
+function renderChat() {
   const frag = document.createDocumentFragment();
 
+  const scroll = document.createElement("div");
+  scroll.className = "chat-scroll";
+
+  if (state.chatMessages.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "chat-empty";
+    empty.textContent = 'Diga o que precisa fazer, ex: "amanhã tenho dentista às 17h".';
+    scroll.appendChild(empty);
+  }
+
+  state.chatMessages.forEach((msg, i) => {
+    const bubble = document.createElement("div");
+    bubble.className = `bubble ${msg.role}`;
+    bubble.textContent = msg.text;
+    scroll.appendChild(bubble);
+
+    if (msg.taskCard) {
+      const cat = CATS[msg.taskCard.category] || CATS.personal;
+      const card = document.createElement("div");
+      card.className = "task-card-mini";
+      const lowConf = typeof msg.taskCard.confianca === "number" && msg.taskCard.confianca < 0.6;
+      card.innerHTML = `
+        <div class="title">${escapeHtml(msg.taskCard.title)}</div>
+        <div class="meta">
+          <span>${fmtDate(msg.taskCard.due_at)}</span>
+          <span class="badge">${cat.label}</span>
+          <span class="badge ${msg.taskCard.priority === "high" ? "high" : ""}">${PRIO_LABEL[msg.taskCard.priority] || msg.taskCard.priority}</span>
+          ${lowConf ? `<span class="badge low-conf">confira os detalhes</span>` : ""}
+        </div>
+      `;
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      const undoBtn = document.createElement("button");
+      undoBtn.className = "undo-btn" + (msg.undone ? " undone" : "");
+      undoBtn.textContent = msg.undone ? "Desfeita" : "Desfazer";
+      undoBtn.disabled = !!msg.undone;
+      undoBtn.onclick = () => desfazerTarefa(msg.taskCard.id, i);
+      actions.appendChild(undoBtn);
+      card.appendChild(actions);
+      scroll.appendChild(card);
+    }
+  });
+
+  if (state.submitting) {
+    const thinking = document.createElement("div");
+    thinking.className = "thinking";
+    thinking.textContent = "Interpretando sua tarefa...";
+    scroll.appendChild(thinking);
+  } else if (state.taskListening) {
+    const thinking = document.createElement("div");
+    thinking.className = "thinking";
+    thinking.textContent = "Ouvindo... fale a tarefa.";
+    scroll.appendChild(thinking);
+  }
+
+  frag.appendChild(scroll);
+
   const inputRow = document.createElement("div");
-  inputRow.className = "input-row";
+  inputRow.className = "chat-input-row";
   const input = document.createElement("input");
   input.placeholder = "Ex: amanhã tenho dentista às 17h";
   input.autocomplete = "off";
-  const sendBtn = document.createElement("button");
-  sendBtn.className = "btn-primary";
-  sendBtn.textContent = state.submitting ? "..." : "Adicionar";
-  sendBtn.disabled = state.submitting;
-  const submit = () => {
-    const texto = input.value.trim();
-    if (!texto || state.submitting) return;
-    input.value = "";
-    enviarTarefa(texto);
-  };
-  sendBtn.onclick = submit;
-  input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
   const micBtn = document.createElement("button");
   micBtn.className = "mic-btn" + (state.taskListening ? " listening" : "");
   micBtn.title = "Adicionar tarefa por voz";
@@ -423,55 +714,76 @@ function renderHome() {
       enviarTarefa(texto);
     });
   };
+  const sendBtn = document.createElement("button");
+  sendBtn.className = "btn-primary";
+  sendBtn.textContent = state.submitting ? "..." : "Enviar";
+  sendBtn.disabled = state.submitting;
+  const submit = () => {
+    const texto = input.value.trim();
+    if (!texto || state.submitting) return;
+    input.value = "";
+    enviarTarefa(texto);
+  };
+  sendBtn.onclick = submit;
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
   inputRow.appendChild(input);
   inputRow.appendChild(micBtn);
   inputRow.appendChild(sendBtn);
   frag.appendChild(inputRow);
 
-  if (state.taskListening) {
-    const thinking = document.createElement("div");
-    thinking.className = "thinking";
-    thinking.textContent = "Ouvindo... fale a tarefa.";
-    frag.appendChild(thinking);
-  } else if (state.submitting) {
-    const thinking = document.createElement("div");
-    thinking.className = "thinking";
-    thinking.textContent = "Interpretando sua tarefa...";
-    frag.appendChild(thinking);
-  }
-
-  if (state.loadingTasks) {
-    const p = document.createElement("div");
-    p.className = "empty";
-    p.textContent = "Carregando tarefas...";
-    frag.appendChild(p);
-  } else if (state.tasks.length === 0) {
-    const p = document.createElement("div");
-    p.className = "empty";
-    p.textContent = "Nenhuma tarefa por aqui. Escreva algo acima para começar.";
-    frag.appendChild(p);
-  } else {
-    state.tasks.forEach((t) => frag.appendChild(renderTaskRow(t)));
-  }
-
   return frag;
 }
 
-function startOfDaySP(d) {
-  // Meia-noite do dia de `d`, no fuso America/Sao_Paulo, como instante UTC comparável.
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit",
-  }).format(d);
-  return new Date(`${parts}T00:00:00-03:00`);
-}
+function renderAgenda() {
+  const frag = document.createDocumentFragment();
 
-function dayLabelSP(d) {
-  const hoje = startOfDaySP(new Date());
-  const dia = startOfDaySP(d);
-  const diffDias = Math.round((hoje - dia) / 86400000);
-  if (diffDias === 0) return "Hoje";
-  if (diffDias === 1) return "Ontem";
-  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", timeZone: "America/Sao_Paulo" });
+  const filterRow = document.createElement("div");
+  filterRow.className = "filter-row";
+  [["todas", "Todas"], ["work", "Trabalho"], ["home", "Casa"], ["personal", "Pessoal"]].forEach(([key, label]) => {
+    const chip = document.createElement("button");
+    chip.className = "filter-chip" + (state.agendaFilter === key ? " active" : "");
+    chip.textContent = label;
+    chip.onclick = () => setState({ agendaFilter: key });
+    filterRow.appendChild(chip);
+  });
+  frag.appendChild(filterRow);
+
+  const tarefas = state.tasks
+    .filter((t) => state.agendaFilter === "todas" || t.category === state.agendaFilter)
+    .slice()
+    .sort((a, b) => new Date(a.due_at) - new Date(b.due_at));
+
+  if (tarefas.length === 0) {
+    const p = document.createElement("div");
+    p.className = "empty";
+    p.textContent = "Nenhuma tarefa nessa categoria.";
+    frag.appendChild(p);
+    return frag;
+  }
+
+  let ultimoDia = null;
+  let grupoAtual = [];
+  const flush = () => {
+    if (!grupoAtual.length) return;
+    const h = document.createElement("div");
+    h.className = "section-header";
+    h.innerHTML = `${ultimoDia} <span class="count">${grupoAtual.length}</span>`;
+    frag.appendChild(h);
+    grupoAtual.forEach((t) => frag.appendChild(renderTaskRow(t)));
+    grupoAtual = [];
+  };
+
+  tarefas.forEach((t) => {
+    const rotulo = dayLabelSP(new Date(t.due_at));
+    if (rotulo !== ultimoDia) {
+      flush();
+      ultimoDia = rotulo;
+    }
+    grupoAtual.push(t);
+  });
+  flush();
+
+  return frag;
 }
 
 function filtrarHistorico(history, filtro) {
@@ -576,7 +888,7 @@ function renderHistory() {
     item.className = "history-item";
     const hora = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
     const titulo = h.details?.titulo || h.details?.tarefa?.titulo || h.details?.tarefa?.title || "";
-    const acaoLabel = { criada: "Criada", concluida: "Concluída", remarcada: "Remarcada", excluida: "Excluída" }[h.action] || h.action;
+    const acaoLabel = { criada: "Criada", concluida: "Concluída", remarcada: "Remarcada", excluida: "Excluída", desfeita: "Desfeita" }[h.action] || h.action;
     item.innerHTML = `<div class="when">${hora}</div><div class="what"><strong>${acaoLabel}</strong>${titulo ? ": " + escapeHtml(titulo) : ""}</div>`;
     card.appendChild(item);
   });
@@ -586,15 +898,66 @@ function renderHistory() {
 
 function renderSettings() {
   const frag = document.createDocumentFragment();
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `<div style="margin-bottom:12px;font-size:14px;color:var(--muted)">Conectado como<br><strong style="color:var(--text)">${state.session.user.email}</strong></div>`;
+
+  const accountCard = document.createElement("div");
+  accountCard.className = "card";
+  accountCard.innerHTML = `<div style="margin-bottom:12px;font-size:14px;color:var(--muted)">Conectado como<br><strong style="color:var(--text)">${escapeHtml(state.session.user.email)}</strong></div>`;
   const logoutBtn = document.createElement("button");
   logoutBtn.className = "btn-secondary";
   logoutBtn.textContent = "Sair da conta";
   logoutBtn.onclick = handleLogout;
-  card.appendChild(logoutBtn);
-  frag.appendChild(card);
+  accountCard.appendChild(logoutBtn);
+  frag.appendChild(accountCard);
+
+  const prefsCard = document.createElement("div");
+  prefsCard.className = "card";
+  prefsCard.innerHTML = `
+    <div class="settings-row"><span class="label">Resumo diário</span><span class="value">ao abrir o app</span></div>
+    <div class="settings-row"><span class="label">Notificações</span><span class="value">via Google Calendar</span></div>
+    <div class="settings-row"><span class="label">IA de interpretação</span><span class="value">Claude (Anthropic)</span></div>
+  `;
+  frag.appendChild(prefsCard);
+
+  const noteCard = document.createElement("div");
+  noteCard.className = "card";
+  noteCard.innerHTML = `<div style="font-size:13px;color:var(--muted);line-height:1.5">
+    As notificações de tarefas usam os lembretes padrão do Google Calendar (não são notificações push do app).
+    Certifique-se de que sua conta Google esteja conectada para recebê-las.
+  </div>`;
+  frag.appendChild(noteCard);
+
+  const dangerCard = document.createElement("div");
+  dangerCard.className = "card";
+  dangerCard.innerHTML = `<div class="danger-zone-title">Zona de risco</div>`;
+  if (!state.confirmDeleteAccount) {
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn-danger";
+    delBtn.textContent = "Excluir conta e dados";
+    delBtn.onclick = () => setState({ confirmDeleteAccount: true });
+    dangerCard.appendChild(delBtn);
+  } else {
+    const warn = document.createElement("div");
+    warn.style.cssText = "font-size:13px;color:var(--muted);margin-bottom:10px;";
+    warn.textContent = "Isso apaga permanentemente suas tarefas, histórico e conexão com o Google. Não pode ser desfeito.";
+    dangerCard.appendChild(warn);
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;gap:8px;";
+    const confirmBtn = document.createElement("button");
+    confirmBtn.className = "btn-danger";
+    confirmBtn.textContent = state.deletingAccount ? "Excluindo..." : "Confirmar exclusão";
+    confirmBtn.disabled = state.deletingAccount;
+    confirmBtn.onclick = excluirConta;
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "btn-secondary";
+    cancelBtn.textContent = "Cancelar";
+    cancelBtn.disabled = state.deletingAccount;
+    cancelBtn.onclick = () => setState({ confirmDeleteAccount: false });
+    row.appendChild(confirmBtn);
+    row.appendChild(cancelBtn);
+    dangerCard.appendChild(row);
+  }
+  frag.appendChild(dangerCard);
+
   return frag;
 }
 
@@ -604,28 +967,27 @@ function renderApp() {
   const header = document.createElement("header");
   header.className = "app-header";
   header.innerHTML = `<h1>Assistente Pessoal</h1>`;
-  const chip = document.createElement("div");
-  chip.className = "user-chip";
-  chip.textContent = state.session.user.email;
-  header.appendChild(chip);
   frag.appendChild(header);
 
   const tabs = document.createElement("div");
   tabs.className = "tabs";
-  [["home", "Tarefas"], ["history", "Histórico"], ["settings", "Ajustes"]].forEach(([key, label]) => {
+  TABS.forEach(([key, label]) => {
     const b = document.createElement("button");
     b.className = "tab" + (state.tab === key ? " active" : "");
     b.textContent = label;
     b.onclick = () => {
       setState({ tab: key });
       if (key === "history") loadHistory();
+      if (key === "hoje" && !state.resumo && !state.resumoLoading) loadResumo();
     };
     tabs.appendChild(b);
   });
   frag.appendChild(tabs);
 
   const content = document.createElement("div");
-  if (state.tab === "home") content.appendChild(renderHome());
+  if (state.tab === "hoje") content.appendChild(renderHoje());
+  else if (state.tab === "chat") content.appendChild(renderChat());
+  else if (state.tab === "agenda") content.appendChild(renderAgenda());
   else if (state.tab === "history") content.appendChild(renderHistory());
   else content.appendChild(renderSettings());
   frag.appendChild(content);
@@ -660,6 +1022,7 @@ async function init() {
     setState({ session });
     await maybeSaveGoogleToken(session);
     await loadTasks();
+    loadResumo();
   } else {
     render();
   }
@@ -669,6 +1032,7 @@ async function init() {
       setState({ session });
       await maybeSaveGoogleToken(session);
       await loadTasks();
+      loadResumo();
     } else if (event === "SIGNED_OUT") {
       setState({ session: null, tasks: [], history: [] });
     }
