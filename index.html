@@ -217,7 +217,7 @@ async function loadTasks() {
   const { data, error } = await supabase
     .from("tasks")
     .select("*")
-    .neq("status", "cancelled")
+    .eq("status", "pending")
     .order("due_at", { ascending: true });
   if (error) console.error(error);
   setState({ tasks: data || [], loadingTasks: false });
