@@ -154,6 +154,7 @@ let state = {
   historySearchResult: null, // { data_inicio, data_fim, descricao }
   historySearching: false,
   historyListening: false,
+  taskListening: false,
   loadingTasks: false,
   submitting: false,
   toast: null,
@@ -322,6 +323,27 @@ function iniciarEscutaHistorico() {
   rec.start();
 }
 
+function iniciarEscutaTarefa(onTexto) {
+  const SpeechRecognition = getSpeechRecognition();
+  if (!SpeechRecognition) {
+    setState({ toast: "Seu navegador não suporta ditado por voz. Digite a tarefa no campo." });
+    setTimeout(() => setState({ toast: null }), 4000);
+    return;
+  }
+  const rec = new SpeechRecognition();
+  rec.lang = "pt-BR";
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  rec.onstart = () => setState({ taskListening: true });
+  rec.onerror = () => setState({ taskListening: false });
+  rec.onend = () => setState({ taskListening: false });
+  rec.onresult = (event) => {
+    const texto = event.results[0][0].transcript;
+    onTexto(texto);
+  };
+  rec.start();
+}
+
 function renderLogin() {
   const div = document.createElement("div");
   div.className = "login-screen";
@@ -389,11 +411,29 @@ function renderHome() {
   };
   sendBtn.onclick = submit;
   input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+  const micBtn = document.createElement("button");
+  micBtn.className = "mic-btn" + (state.taskListening ? " listening" : "");
+  micBtn.title = "Adicionar tarefa por voz";
+  micBtn.type = "button";
+  micBtn.textContent = state.taskListening ? "●" : "🎤";
+  micBtn.disabled = state.submitting;
+  micBtn.onclick = () => {
+    iniciarEscutaTarefa((texto) => {
+      if (!texto || state.submitting) return;
+      enviarTarefa(texto);
+    });
+  };
   inputRow.appendChild(input);
+  inputRow.appendChild(micBtn);
   inputRow.appendChild(sendBtn);
   frag.appendChild(inputRow);
 
-  if (state.submitting) {
+  if (state.taskListening) {
+    const thinking = document.createElement("div");
+    thinking.className = "thinking";
+    thinking.textContent = "Ouvindo... fale a tarefa.";
+    frag.appendChild(thinking);
+  } else if (state.submitting) {
     const thinking = document.createElement("div");
     thinking.className = "thinking";
     thinking.textContent = "Interpretando sua tarefa...";
