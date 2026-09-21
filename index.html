@@ -231,6 +231,31 @@
   .btn-secondary { background: var(--pill-bg); color: var(--text); padding: 10px 16px; font-size: 13.5px; border-radius: 10px; }
   .danger-warning { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
 
+  /* Task detail modal (Hoje) */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(23,20,15,0.45); z-index: 40;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  .modal-sheet {
+    width: 100%; max-width: 480px; background: var(--card); border-radius: 20px 20px 0 0;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.18);
+  }
+  .modal-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--card-border); margin: 0 auto 16px; }
+  .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  .modal-title { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
+  .modal-title.done-title { text-decoration: line-through; color: var(--muted); }
+  .modal-close { color: var(--muted); font-size: 22px; line-height: 1; padding: 2px 4px; flex-shrink: 0; }
+  .modal-meta-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text); padding: 9px 0; border-bottom: 1px solid var(--card-border); }
+  .modal-meta-row:last-of-type { border-bottom: none; }
+  .modal-meta-row .lbl { color: var(--muted); width: 92px; flex-shrink: 0; font-size: 12.5px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.04em; }
+  .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .modal-btn { width: 100%; padding: 13px; border-radius: 12px; font-weight: 700; font-size: 14.5px; text-align: center; }
+  .modal-btn.done { background: var(--dark); color: #fff; }
+  .modal-btn.cancel { background: #f7dbd3; color: var(--rust); }
+  .modal-btn.close-btn { background: var(--pill-bg); color: var(--text); }
+  .modal-btn:disabled { opacity: 0.5; }
+
   .toast {
     position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%);
     background: var(--dark); color: #fff; padding: 12px 20px; border-radius: 12px;
@@ -309,6 +334,8 @@ let state = {
   agendaFilter: "todas",
   confirmDeleteAccount: false,
   deletingAccount: false,
+  selectedTaskId: null,
+  taskModalLoading: null, // 'concluir' | 'cancelar' | null
 };
 
 function setState(patch) {
@@ -412,6 +439,32 @@ async function marcarConcluida(task) {
     });
     await loadTasks();
     loadResumo();
+  }
+}
+
+async function concluirTarefaDetalhe(task) {
+  setState({ taskModalLoading: "concluir" });
+  await marcarConcluida(task);
+  setState({ selectedTaskId: null, taskModalLoading: null });
+}
+
+async function cancelarTarefaDetalhe(task) {
+  setState({ taskModalLoading: "cancelar" });
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/desfazer-tarefa`, {
+      method: "POST",
+      headers: { "content-type": "application/json", Authorization: `Bearer ${state.session.access_token}` },
+      body: JSON.stringify({ task_id: task.id }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || "Erro ao cancelar tarefa");
+    setState({ selectedTaskId: null, taskModalLoading: null, toast: "Tarefa cancelada." });
+    await loadTasks();
+    loadResumo();
+    setTimeout(() => setState({ toast: null }), 3000);
+  } catch (e) {
+    setState({ taskModalLoading: null, toast: `Erro: ${e.message}` });
+    setTimeout(() => setState({ toast: null }), 4000);
   }
 }
 
@@ -618,9 +671,11 @@ function renderTaskRow(task, opts = {}) {
   const overdue = !!opts.overdue;
   const row = document.createElement("div");
   row.className = "task-row" + (overdue ? " overdue" : "");
+  row.style.cursor = "pointer";
+  row.onclick = () => setState({ selectedTaskId: task.id });
   const checkBtn = document.createElement("button");
   checkBtn.className = "checkbox";
-  checkBtn.onclick = () => marcarConcluida(task);
+  checkBtn.onclick = (e) => { e.stopPropagation(); marcarConcluida(task); };
   row.appendChild(checkBtn);
   const body = document.createElement("div");
   body.className = "body";
@@ -1281,6 +1336,80 @@ function renderInputBar() {
   return wrap;
 }
 
+function renderTaskDetailModal() {
+  if (!state.selectedTaskId) return null;
+  const task = state.tasks.find((t) => t.id === state.selectedTaskId);
+  if (!task) return null;
+
+  const cat = CATS[task.category] || CATS.personal;
+  const loading = state.taskModalLoading;
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "modal-backdrop";
+  backdrop.onclick = (e) => { if (e.target === backdrop && !loading) setState({ selectedTaskId: null }); };
+
+  const sheet = document.createElement("div");
+  sheet.className = "modal-sheet";
+  sheet.onclick = (e) => e.stopPropagation();
+
+  const handle = document.createElement("div");
+  handle.className = "modal-handle";
+  sheet.appendChild(handle);
+
+  const head = document.createElement("div");
+  head.className = "modal-head";
+  head.innerHTML = `<div class="modal-title">${escapeHtml(task.title)}</div>`;
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "modal-close";
+  closeBtn.textContent = "×";
+  closeBtn.disabled = !!loading;
+  closeBtn.onclick = () => setState({ selectedTaskId: null });
+  head.appendChild(closeBtn);
+  sheet.appendChild(head);
+
+  const dataFmt = new Date(task.due_at).toLocaleDateString("pt-BR", {
+    weekday: "long", day: "2-digit", month: "long", timeZone: "America/Sao_Paulo",
+  });
+  const horaFmt = new Date(task.due_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
+
+  const rows = document.createElement("div");
+  rows.innerHTML = `
+    <div class="modal-meta-row"><span class="lbl">Quando</span><span>${dataFmt.charAt(0).toUpperCase() + dataFmt.slice(1)} · ${horaFmt}</span></div>
+    <div class="modal-meta-row"><span class="lbl">Categoria</span><span class="cat-dot" style="background:${cat.color}"></span><span>${cat.label}</span></div>
+    <div class="modal-meta-row"><span class="lbl">Prioridade</span><span>${PRIO_LABEL[task.priority] || task.priority}</span></div>
+    <div class="modal-meta-row"><span class="lbl">Calendar</span><span>${task.google_event_id ? "Sincronizada com o Google Calendar" : "Não sincronizada"}</span></div>
+  `;
+  sheet.appendChild(rows);
+
+  const actions = document.createElement("div");
+  actions.className = "modal-actions";
+
+  const doneBtn = document.createElement("button");
+  doneBtn.className = "modal-btn done";
+  doneBtn.textContent = loading === "concluir" ? "Concluindo…" : "Marcar como concluída";
+  doneBtn.disabled = !!loading;
+  doneBtn.onclick = () => concluirTarefaDetalhe(task);
+  actions.appendChild(doneBtn);
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.className = "modal-btn cancel";
+  cancelBtn.textContent = loading === "cancelar" ? "Cancelando…" : "Cancelar tarefa";
+  cancelBtn.disabled = !!loading;
+  cancelBtn.onclick = () => cancelarTarefaDetalhe(task);
+  actions.appendChild(cancelBtn);
+
+  const closeActionBtn = document.createElement("button");
+  closeActionBtn.className = "modal-btn close-btn";
+  closeActionBtn.textContent = "Fechar";
+  closeActionBtn.disabled = !!loading;
+  closeActionBtn.onclick = () => setState({ selectedTaskId: null });
+  actions.appendChild(closeActionBtn);
+
+  sheet.appendChild(actions);
+  backdrop.appendChild(sheet);
+  return backdrop;
+}
+
 function renderApp() {
   const wrap = document.createDocumentFragment();
 
@@ -1297,6 +1426,9 @@ function renderApp() {
   if (inputBar) wrap.appendChild(inputBar);
 
   wrap.appendChild(renderTabBar());
+
+  const modal = renderTaskDetailModal();
+  if (modal) wrap.appendChild(modal);
 
   if (state.toast) {
     const t = document.createElement("div");
