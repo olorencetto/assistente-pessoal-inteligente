@@ -639,8 +639,8 @@ function dayLabelSP(d) {
   const dia = startOfDaySP(d);
   const diffDias = Math.round((hoje - dia) / 86400000);
   if (diffDias === 0) return "Hoje";
-  if (diffDias === 1) return "Amanhã";
-  if (diffDias === -1) return "Ontem";
+  if (diffDias === -1) return "Amanhã";
+  if (diffDias === 1) return "Ontem";
   return d.toLocaleDateString("pt-BR", { weekday: "long", timeZone: "America/Sao_Paulo" }).replace(/^\w/, (c) => c.toUpperCase());
 }
 
