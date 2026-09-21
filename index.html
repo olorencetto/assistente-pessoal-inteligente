@@ -6,173 +6,246 @@
 <title>Assistente Pessoal Inteligente</title>
 <style>
   :root {
-    --bg: #f7f7f8;
+    --bg: #efece5;
     --card: #ffffff;
-    --text: #1a1a1a;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --work: #2F5AA8;
-    --home: #1F7A5C;
-    --personal: #8A4FBF;
-    --accent: #111827;
-    --danger: #b3261e;
+    --card-border: #e6e0d3;
+    --text: #1c1a15;
+    --muted: #8b8577;
+    --dark: #17140f;
+    --dark-tile: #2b271f;
+    --work: #3d4fb0;
+    --home: #2f7b4f;
+    --personal: #8a4fbf;
+    --accent: #2f4bd6;
+    --accent-dark: #171d33;
+    --rust: #b5502e;
+    --pill-bg: #efe9dc;
+    --mono: ui-monospace, "SF Mono", "Roboto Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
   }
-  .wrap { max-width: 560px; margin: 0 auto; padding: 20px 16px 100px; }
-  header.app-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 0 20px;
-  }
-  header.app-header h1 { font-size: 20px; margin: 0; }
-  .user-chip { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
-  .user-chip img { width: 28px; height: 28px; border-radius: 50%; }
-  button {
-    font: inherit; cursor: pointer; border: none; border-radius: 10px;
-  }
-  .btn-primary {
-    background: var(--accent); color: #fff; padding: 12px 18px; font-weight: 600; font-size: 15px;
-  }
-  .btn-primary:disabled { opacity: 0.5; cursor: default; }
-  .btn-secondary {
-    background: transparent; color: var(--muted); padding: 8px 12px; font-size: 13px; border: 1px solid var(--border);
-  }
-  .btn-danger {
-    background: #fdecea; color: var(--danger); padding: 10px 16px; font-size: 14px; font-weight: 600;
-    border: 1px solid #f5c6c2;
-  }
-  .login-screen {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 70vh; text-align: center; gap: 16px;
-  }
-  .login-screen h2 { margin: 0; font-size: 22px; }
-  .login-screen p { color: var(--muted); margin: 0 0 8px; max-width: 320px; }
-  .google-btn {
-    display: flex; align-items: center; gap: 10px; background: #fff; color: #1a1a1a;
-    border: 1px solid var(--border); padding: 12px 20px; font-size: 15px; font-weight: 500;
-    border-radius: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-  }
-  .card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-    padding: 16px; margin-bottom: 12px;
-  }
-  .input-row { display: flex; gap: 8px; margin-bottom: 20px; }
-  .input-row input {
-    flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
-    font-size: 15px; background: var(--card);
-  }
-  .input-row input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-  .tabs { display: flex; gap: 2px; margin-bottom: 16px; border-bottom: 1px solid var(--border); overflow-x: auto; }
-  .tab {
-    background: none; padding: 10px 10px; font-size: 13px; color: var(--muted); font-weight: 500;
-    border-bottom: 2px solid transparent; white-space: nowrap; flex-shrink: 0;
-  }
-  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
-  .task { display: flex; align-items: flex-start; gap: 12px; }
-  .task .dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
-  .task .body { flex: 1; min-width: 0; }
-  .task .title { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
-  .task .meta { font-size: 13px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
-  .badge {
-    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
-    background: #f1f1f3; color: var(--muted);
-  }
-  .badge.high { background: #fdecea; color: var(--danger); }
-  .badge.low-conf { background: #fff7e0; color: #93650a; }
-  .task .cal-link { font-size: 12px; color: var(--work); text-decoration: none; }
-  .task .done-btn {
-    background: none; border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px;
-    font-size: 12px; color: var(--muted); flex-shrink: 0;
-  }
-  .empty { text-align: center; color: var(--muted); padding: 40px 20px; font-size: 14px; }
-  .toast {
-    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
-    background: var(--accent); color: #fff; padding: 12px 20px; border-radius: 10px;
-    font-size: 14px; max-width: 90vw; text-align: center; z-index: 20;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  }
-  .thinking { font-size: 13px; color: var(--muted); padding: 4px 2px 16px; }
-  .footer-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 24px; }
-  .history-item { border-bottom: 1px solid var(--border); padding: 10px 0; }
-  .history-item:last-child { border-bottom: none; }
-  .history-item .when { font-size: 12px; color: var(--muted); }
-  .history-item .what { font-size: 14px; margin-top: 2px; }
-  .history-day-header { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 6px; }
-  .history-day-header:first-child { margin-top: 0; }
-  .section-header {
-    font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;
-    margin: 20px 0 8px; display: flex; align-items: center; gap: 6px;
-  }
-  .section-header:first-child { margin-top: 0; }
-  .section-header .count { background: var(--border); color: var(--muted); border-radius: 999px; padding: 1px 7px; font-size: 11px; }
-  .filter-row { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
-  .filter-chip {
-    background: var(--card); border: 1px solid var(--border); border-radius: 999px;
-    padding: 6px 14px; font-size: 13px; color: var(--muted);
-  }
-  .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
-  .search-row input {
-    flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border);
-    font-size: 14px; background: var(--card);
-  }
-  .search-row input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-  .mic-btn {
-    width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; border: 1px solid var(--border);
-    background: var(--card); display: flex; align-items: center; justify-content: center; font-size: 16px;
-  }
-  .mic-btn.listening { background: var(--danger); border-color: var(--danger); color: #fff; }
-  .search-result-chip {
-    display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 10px; padding: 8px 12px;
-    font-size: 13px; margin-bottom: 14px;
-  }
-  .search-result-chip .clear-search { background: none; color: var(--muted); font-size: 12px; text-decoration: underline; padding: 0; }
+  .phone { max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--bg); position: relative; display: flex; flex-direction: column; }
+  .content { flex: 1; padding: 20px 18px 12px; padding-bottom: 190px; }
+  button { font: inherit; cursor: pointer; border: none; background: none; }
   a { color: inherit; }
 
-  /* Hoje */
-  .greeting { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
-  .greeting-sub { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
-  .progress-card { display: flex; align-items: center; justify-content: space-between; }
-  .progress-card .num { font-size: 26px; font-weight: 700; }
-  .progress-card .label { font-size: 13px; color: var(--muted); }
-  .resumo-card { background: #111827; color: #fff; }
-  .resumo-card .tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.7; margin-bottom: 6px; }
-  .resumo-card p { margin: 0; font-size: 15px; line-height: 1.4; }
-
-  /* Chat */
-  .chat-scroll { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-  .bubble { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.4; }
-  .bubble.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
-  .bubble.assistant { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-  .task-card-mini { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; align-self: flex-start; max-width: 90%; }
-  .task-card-mini .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-  .task-card-mini .meta { font-size: 12px; color: var(--muted); display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-  .task-card-mini .actions { display: flex; gap: 8px; }
-  .undo-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: 5px 12px; font-size: 12px; border-radius: 8px; }
-  .undo-btn.undone { color: var(--danger); border-color: #f5c6c2; }
-  .chat-empty { text-align: center; color: var(--muted); padding: 30px 16px; font-size: 14px; }
-  .chat-input-row { display: flex; gap: 8px; position: sticky; bottom: 12px; }
-  .chat-input-row input {
-    flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
-    font-size: 15px; background: var(--card); box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  .mono { font-family: var(--mono); }
+  .label-mono {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
   }
 
-  /* Ajustes */
-  .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  /* Login */
+  .login-screen {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; text-align: center; gap: 16px; padding: 24px;
+  }
+  .login-screen h2 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.01em; }
+  .login-screen p { color: var(--muted); margin: 0 0 8px; max-width: 320px; line-height: 1.5; }
+  .google-btn {
+    display: flex; align-items: center; gap: 10px; background: #fff; color: #1a1a1a;
+    border: 1px solid var(--card-border); padding: 13px 22px; font-size: 15px; font-weight: 600;
+    border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  /* Header / greeting */
+  .top-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+  .date-label { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .progress-label { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .greeting { font-size: 30px; font-weight: 800; letter-spacing: -0.015em; margin: 2px 0 16px; }
+  .page-title { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; margin: 4px 0 4px; }
+  .page-subtitle { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+
+  /* Resumo card */
+  .resumo-card { background: var(--dark); color: #fff; border-radius: 18px; padding: 16px 16px 14px; margin-bottom: 22px; }
+  .resumo-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .resumo-head .tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #a6a196; }
+  .resumo-head .time { font-family: var(--mono); font-size: 12px; color: #a6a196; }
+  .resumo-card p { margin: 0 0 14px; font-size: 15px; line-height: 1.45; }
+  .resumo-tiles { display: flex; gap: 8px; }
+  .resumo-tile { flex: 1; background: var(--dark-tile); border-radius: 10px; padding: 10px 12px; }
+  .resumo-tile .num { font-size: 20px; font-weight: 800; line-height: 1.1; }
+  .resumo-tile .lbl { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #a6a196; margin-top: 2px; }
+
+  /* Section headers */
+  .section-header {
+    display: flex; align-items: center; gap: 10px; margin: 20px 0 8px;
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--rust);
+  }
+  .section-header.neutral { color: var(--muted); }
+  .section-header::after { content: ""; flex: 1; height: 1px; background: var(--card-border); }
+  .section-header .count { color: var(--muted); font-weight: 400; }
+
+  /* Task row */
+  .task-row {
+    display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 14px; padding: 13px 14px; margin-bottom: 8px;
+  }
+  .task-row.done { opacity: 0.55; }
+  .checkbox {
+    width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--card-border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; background: #fff;
+  }
+  .checkbox.checked { background: var(--home); border-color: var(--home); color: #fff; font-size: 13px; }
+  .task-row .body { flex: 1; min-width: 0; }
+  .task-row .title { font-weight: 600; font-size: 15px; margin-bottom: 3px; }
+  .task-row.done .title { text-decoration: line-through; }
+  .task-row .meta { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .task-row .meta .time { font-family: var(--mono); color: var(--text); }
+  .task-row.overdue .meta .time { color: var(--rust); font-weight: 600; }
+  .cat-dot { width: 7px; height: 7px; border-radius: 2px; display: inline-block; }
+  .badge-prio {
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.03em;
+    padding: 2px 7px; border-radius: 999px; background: var(--pill-bg); color: var(--muted);
+  }
+  .badge-prio.high { background: #f7dbd3; color: var(--rust); }
+  .badge-low-conf { font-family: var(--mono); font-size: 10px; text-transform: uppercase; color: var(--rust); background: #f7dbd3; padding: 2px 7px; border-radius: 999px; }
+  .chevron { color: var(--muted); font-size: 18px; flex-shrink: 0; }
+  .cal-tag { font-size: 11px; color: var(--work); }
+
+  .empty { text-align: center; color: var(--muted); padding: 40px 16px; font-size: 14px; }
+
+  /* Bottom quick-add bar (Hoje) */
+  .quick-add-bar { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .quick-add-bar input {
+    flex: 1; padding: 13px 16px; border-radius: 999px; border: 1px solid var(--card-border);
+    font-size: 15px; background: var(--card); box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .quick-add-bar input:focus { outline: none; border-color: var(--accent); }
+  .mic-btn {
+    width: 46px; height: 46px; flex-shrink: 0; border-radius: 50%; border: none;
+    background: var(--accent-dark); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .mic-btn.listening { background: var(--rust); }
+  .mic-btn:disabled { opacity: 0.5; }
+
+  /* Chat */
+  .chat-scroll { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+  .bubble { max-width: 85%; padding: 11px 15px; border-radius: 16px; font-size: 14.5px; line-height: 1.45; }
+  .bubble.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+  .bubble.assistant { align-self: flex-start; background: var(--card); border: 1px solid var(--card-border); border-bottom-left-radius: 4px; }
+  .task-card-mini { background: var(--card); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px; align-self: flex-start; max-width: 92%; }
+  .task-card-mini .head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .task-card-mini .head .check { color: var(--home); font-size: 14px; }
+  .task-card-mini .head .lbl { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--home); }
+  .task-card-mini .title { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .task-card-mini .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .chip-tag { font-size: 12px; background: var(--pill-bg); color: var(--text); padding: 3px 10px; border-radius: 999px; }
+  .task-card-mini .actions-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .task-card-mini .actions { display: flex; gap: 8px; }
+  .btn-pill { font-size: 12.5px; padding: 6px 13px; border-radius: 999px; font-weight: 600; }
+  .btn-pill.undo { background: #f7dbd3; color: var(--rust); }
+  .btn-pill.undo.undone { opacity: 0.5; }
+  .btn-pill.view { background: #dde3fb; color: var(--accent); }
+  .confidence-note { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .chat-empty { text-align: center; color: var(--muted); padding: 30px 16px; font-size: 14px; }
+  .thinking { font-size: 13px; color: var(--muted); padding: 4px 2px; }
+  .suggest-row { display: flex; gap: 8px; overflow-x: auto; margin: 10px 0 12px; padding-bottom: 2px; }
+  .suggest-chip { flex-shrink: 0; font-size: 13px; background: #dde3fb; color: var(--accent); padding: 7px 14px; border-radius: 999px; white-space: nowrap; }
+  .chat-input-row { display: flex; align-items: center; gap: 10px; }
+  .chat-input-row input {
+    flex: 1; padding: 13px 16px; border-radius: 999px; border: 1px solid var(--card-border);
+    font-size: 15px; background: var(--card);
+  }
+  .chat-input-row input:focus { outline: none; border-color: var(--accent); }
+  .send-btn {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--pill-bg); color: var(--muted);
+    display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+  }
+
+  /* Agenda */
+  .filter-row { display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; }
+  .filter-chip {
+    display: flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 999px; padding: 7px 14px; font-size: 13px; color: var(--text); flex-shrink: 0; white-space: nowrap;
+  }
+  .filter-chip.active { background: var(--dark); color: #fff; border-color: var(--dark); }
+  .filter-dot { width: 7px; height: 7px; border-radius: 2px; display: inline-block; }
+  .agenda-row {
+    display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 14px; padding: 13px 14px; margin-bottom: 8px;
+  }
+  .agenda-row .time { font-family: var(--mono); font-weight: 700; font-size: 14px; width: 46px; flex-shrink: 0; }
+  .agenda-row .bar { width: 3px; align-self: stretch; border-radius: 2px; flex-shrink: 0; }
+  .agenda-row .body { flex: 1; min-width: 0; }
+  .agenda-row .title { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+  .agenda-row .sub { font-size: 12.5px; color: var(--muted); }
+
+  /* History */
+  .history-day-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px 15px; margin-bottom: 12px; }
+  .history-day-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .history-day-head .day { font-weight: 700; font-size: 14.5px; }
+  .history-day-head .day .date { font-weight: 400; color: var(--muted); font-family: var(--mono); font-size: 12px; }
+  .history-day-head .ratio { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--rust); }
+  .history-summary { font-size: 13.5px; color: var(--text); line-height: 1.45; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-border); }
+  .history-event { display: flex; align-items: baseline; gap: 8px; font-size: 13px; padding: 3px 0; }
+  .history-event .when { font-family: var(--mono); color: var(--muted); width: 44px; flex-shrink: 0; }
+  .history-event .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .history-event .what { color: var(--text); }
+  .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .search-row input {
+    flex: 1; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--card-border);
+    font-size: 14px; background: var(--card);
+  }
+  .search-row input:focus { outline: none; border-color: var(--accent); }
+  .search-result-chip {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    background: #dde3fb; border-radius: 12px; padding: 9px 13px; font-size: 13px; margin-bottom: 14px;
+  }
+  .search-result-chip .clear-search { color: var(--accent); font-size: 12px; text-decoration: underline; }
+
+  /* Settings */
+  .settings-section-label {
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);
+    margin: 20px 0 8px;
+  }
+  .settings-section-label:first-child { margin-top: 0; }
+  .settings-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; }
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 15px; border-bottom: 1px solid var(--card-border);
+  }
   .settings-row:last-child { border-bottom: none; }
-  .settings-row .label { color: var(--text); }
-  .settings-row .value { color: var(--muted); font-size: 13px; }
-  .danger-zone-title { font-size: 13px; font-weight: 700; color: var(--danger); margin: 4px 0 10px; }
+  .settings-row .label { font-size: 14.5px; }
+  .settings-row .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .settings-row .value { font-family: var(--mono); font-size: 13px; color: var(--accent); flex-shrink: 0; }
+  .settings-row.link .label { color: var(--rust); font-weight: 600; }
+  .settings-row.danger .label { color: var(--rust); font-weight: 600; }
+  .btn-primary { background: var(--dark); color: #fff; padding: 12px 20px; font-weight: 700; font-size: 14.5px; border-radius: 12px; }
+  .btn-primary:disabled { opacity: 0.5; }
+  .btn-secondary { background: var(--pill-bg); color: var(--text); padding: 10px 16px; font-size: 13.5px; border-radius: 10px; }
+  .danger-warning { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%);
+    background: var(--dark); color: #fff; padding: 12px 20px; border-radius: 12px;
+    font-size: 13.5px; max-width: 90vw; text-align: center; z-index: 30;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  }
+
+  /* Bottom tab bar */
+  .tabbar-wrap {
+    position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center;
+    background: linear-gradient(to top, var(--bg) 60%, transparent); padding-top: 14px; z-index: 20;
+  }
+  .tabbar-inner { width: 100%; max-width: 480px; }
+  .tabbar {
+    display: flex; background: var(--card); border-top: 1px solid var(--card-border);
+    padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+  }
+  .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--muted); padding: 4px 0; }
+  .tab-btn.active { color: var(--accent); }
+  .tab-btn svg { width: 22px; height: 22px; }
+  .tab-btn .tab-label { font-size: 10.5px; }
 </style>
 </head>
 <body>
-<div id="app" class="wrap"></div>
+<div id="app" class="phone"></div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
@@ -188,12 +261,21 @@ const CATS = {
   personal: { label: "Pessoal", color: "var(--personal)" },
 };
 const PRIO_LABEL = { low: "baixa", medium: "média", high: "alta" };
+
+const ICONS = {
+  hoje: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg>`,
+  chat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>`,
+  agenda: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M16 2.5v4M8 2.5v4M3 9.5h18"/></svg>`,
+  historico: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>`,
+  ajustes: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2.5 12H5M19 12h2.5M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>`,
+};
+
 const TABS = [
-  ["hoje", "Hoje"],
-  ["chat", "Chat"],
-  ["agenda", "Agenda"],
-  ["history", "Histórico"],
-  ["settings", "Ajustes"],
+  ["hoje", "Hoje", ICONS.hoje],
+  ["chat", "Chat", ICONS.chat],
+  ["agenda", "Agenda", ICONS.agenda],
+  ["history", "Histórico", ICONS.historico],
+  ["settings", "Ajustes", ICONS.ajustes],
 ];
 
 const app = document.getElementById("app");
@@ -505,32 +587,37 @@ function escapeHtml(s) {
   return d.innerHTML;
 }
 
-function renderTaskRow(task) {
+function renderTaskRow(task, opts = {}) {
   const cat = CATS[task.category] || CATS.personal;
+  const overdue = !!opts.overdue;
   const row = document.createElement("div");
-  row.className = "card task";
-  row.innerHTML = `
-    <div class="dot" style="background:${cat.color}"></div>
-    <div class="body">
-      <div class="title">${escapeHtml(task.title)}</div>
-      <div class="meta">
-        <span>${fmtDate(task.due_at)}</span>
-        <span class="badge">${cat.label}</span>
-        <span class="badge ${task.priority === "high" ? "high" : ""}">${PRIO_LABEL[task.priority] || task.priority}</span>
-        ${task.google_event_id ? `<span class="cal-link">📅 no Calendar</span>` : ""}
-      </div>
+  row.className = "task-row" + (overdue ? " overdue" : "");
+  const checkBtn = document.createElement("button");
+  checkBtn.className = "checkbox";
+  checkBtn.onclick = () => marcarConcluida(task);
+  row.appendChild(checkBtn);
+  const body = document.createElement("div");
+  body.className = "body";
+  body.innerHTML = `
+    <div class="title">${escapeHtml(task.title)}</div>
+    <div class="meta">
+      <span class="time">${new Date(task.due_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" })}</span>
+      <span>·</span>
+      <span class="cat-dot" style="background:${cat.color}"></span>
+      <span>${cat.label}</span>
+      ${task.priority === "high" ? `<span class="badge-prio high">${PRIO_LABEL[task.priority]}</span>` : `<span class="badge-prio">${PRIO_LABEL[task.priority] || task.priority}</span>`}
+      ${task.google_event_id ? `<span class="cal-tag">📅</span>` : ""}
     </div>
   `;
-  const doneBtn = document.createElement("button");
-  doneBtn.className = "done-btn";
-  doneBtn.textContent = "Concluir";
-  doneBtn.onclick = () => marcarConcluida(task);
-  row.appendChild(doneBtn);
+  row.appendChild(body);
+  const chev = document.createElement("span");
+  chev.className = "chevron";
+  chev.textContent = "›";
+  row.appendChild(chev);
   return row;
 }
 
 function startOfDaySP(d) {
-  // Meia-noite do dia de `d`, no fuso America/Sao_Paulo, como instante UTC comparável.
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit",
   }).format(d);
@@ -554,7 +641,11 @@ function dayLabelSP(d) {
   if (diffDias === 0) return "Hoje";
   if (diffDias === 1) return "Amanhã";
   if (diffDias === -1) return "Ontem";
-  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", timeZone: "America/Sao_Paulo" });
+  return d.toLocaleDateString("pt-BR", { weekday: "long", timeZone: "America/Sao_Paulo" }).replace(/^\w/, (c) => c.toUpperCase());
+}
+
+function dateNumLabelSP(d) {
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", timeZone: "America/Sao_Paulo" }).replace(".", "").toUpperCase();
 }
 
 function saudacao() {
@@ -564,6 +655,37 @@ function saudacao() {
   return "Boa noite";
 }
 
+function renderQuickAddBar() {
+  const bar = document.createElement("div");
+  bar.className = "quick-add-bar";
+  const input = document.createElement("input");
+  input.placeholder = "Diga o que precisa fazer…";
+  input.autocomplete = "off";
+  input.disabled = state.submitting;
+  const submit = () => {
+    const texto = input.value.trim();
+    if (!texto || state.submitting) return;
+    input.value = "";
+    enviarTarefa(texto);
+  };
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+  const micBtn = document.createElement("button");
+  micBtn.className = "mic-btn" + (state.taskListening ? " listening" : "");
+  micBtn.title = "Adicionar tarefa por voz";
+  micBtn.type = "button";
+  micBtn.textContent = state.taskListening ? "●" : "🎤";
+  micBtn.disabled = state.submitting;
+  micBtn.onclick = () => {
+    iniciarEscutaTarefa((texto) => {
+      if (!texto || state.submitting) return;
+      enviarTarefa(texto);
+    });
+  };
+  bar.appendChild(input);
+  bar.appendChild(micBtn);
+  return bar;
+}
+
 function renderHoje() {
   const frag = document.createDocumentFragment();
   const agora = new Date();
@@ -571,48 +693,51 @@ function renderHoje() {
   const inicioAmanha = new Date(inicioHoje.getTime() + 86400000);
 
   const nome = (state.session.user.user_metadata?.full_name || state.session.user.email || "").split(" ")[0].split("@")[0];
-  const greetingWrap = document.createElement("div");
-  greetingWrap.innerHTML = `
-    <div class="greeting">${saudacao()}${nome ? ", " + escapeHtml(nome) : ""}</div>
-    <div class="greeting-sub">${agora.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", timeZone: "America/Sao_Paulo" })}</div>
+
+  const topRow = document.createElement("div");
+  topRow.className = "top-row";
+  topRow.innerHTML = `
+    <span class="date-label">${agora.toLocaleDateString("pt-BR", { weekday: "long", timeZone: "America/Sao_Paulo" }).slice(0, 3)} · ${dateNumLabelSP(agora)}</span>
+    <span class="progress-label">${state.resumo?.feitasHoje ?? 0}/${state.resumo?.totalHoje ?? 0} feitas</span>
   `;
-  frag.appendChild(greetingWrap);
+  frag.appendChild(topRow);
+
+  const greeting = document.createElement("div");
+  greeting.className = "greeting";
+  greeting.textContent = `${saudacao()}${nome ? ", " + nome.charAt(0).toUpperCase() + nome.slice(1) : ""}`;
+  frag.appendChild(greeting);
+
+  const resumoCard = document.createElement("div");
+  resumoCard.className = "resumo-card";
+  const horaResumo = agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
+  if (state.resumoLoading) {
+    resumoCard.innerHTML = `<div class="resumo-head"><span class="tag">Resumo da manhã</span><span class="time">${horaResumo}</span></div><p>Gerando seu resumo...</p>`;
+  } else {
+    const texto = state.resumo?.texto || "Não foi possível gerar o resumo agora.";
+    resumoCard.innerHTML = `
+      <div class="resumo-head"><span class="tag">Resumo da manhã</span><span class="time">${horaResumo}</span></div>
+      <p>${escapeHtml(texto)}</p>
+      <div class="resumo-tiles">
+        <div class="resumo-tile"><div class="num">${state.resumo?.pendentes ?? 0}</div><div class="lbl">Pendentes</div></div>
+        <div class="resumo-tile"><div class="num">${state.resumo?.atrasadas ?? 0}</div><div class="lbl">Atrasadas</div></div>
+        <div class="resumo-tile"><div class="num">${state.resumo?.deOntem ?? 0}</div><div class="lbl">De ontem</div></div>
+      </div>
+    `;
+  }
+  frag.appendChild(resumoCard);
 
   const tarefasHoje = state.tasks.filter((t) => {
     const d = new Date(t.due_at);
     return d >= inicioHoje && d < inicioAmanha;
   });
   const atrasadas = state.tasks.filter((t) => new Date(t.due_at) < inicioHoje);
-  const totalHoje = tarefasHoje.length + (state.resumo?.feitasHoje || 0) - tarefasHoje.filter((t) => t.status === "done").length;
-  const feitasHoje = state.resumo?.feitasHoje ?? 0;
-
-  const progressCard = document.createElement("div");
-  progressCard.className = "card progress-card";
-  progressCard.innerHTML = `
-    <div>
-      <div class="num">${feitasHoje}/${state.resumo?.totalHoje ?? tarefasHoje.length + feitasHoje}</div>
-      <div class="label">tarefas concluídas hoje</div>
-    </div>
-  `;
-  frag.appendChild(progressCard);
-
-  const resumoCard = document.createElement("div");
-  resumoCard.className = "card resumo-card";
-  if (state.resumoLoading) {
-    resumoCard.innerHTML = `<div class="tag">Resumo do dia</div><p>Gerando seu resumo...</p>`;
-  } else if (state.resumo) {
-    resumoCard.innerHTML = `<div class="tag">Resumo do dia</div><p>${escapeHtml(state.resumo.texto)}</p>`;
-  } else {
-    resumoCard.innerHTML = `<div class="tag">Resumo do dia</div><p>Não foi possível gerar o resumo agora.</p>`;
-  }
-  frag.appendChild(resumoCard);
 
   if (atrasadas.length > 0) {
     const h = document.createElement("div");
     h.className = "section-header";
-    h.innerHTML = `Atrasadas <span class="count">${atrasadas.length}</span>`;
+    h.innerHTML = `Atrasadas`;
     frag.appendChild(h);
-    atrasadas.forEach((t) => frag.appendChild(renderTaskRow(t)));
+    atrasadas.forEach((t) => frag.appendChild(renderTaskRow(t, { overdue: true })));
   }
 
   const grupos = { "Manhã": [], "Tarde": [], "Noite": [] };
@@ -621,8 +746,8 @@ function renderHoje() {
   ["Manhã", "Tarde", "Noite"].forEach((periodo) => {
     if (grupos[periodo].length === 0) return;
     const h = document.createElement("div");
-    h.className = "section-header";
-    h.innerHTML = `${periodo} <span class="count">${grupos[periodo].length}</span>`;
+    h.className = "section-header neutral";
+    h.innerHTML = periodo;
     frag.appendChild(h);
     grupos[periodo].forEach((t) => frag.appendChild(renderTaskRow(t)));
   });
@@ -630,15 +755,21 @@ function renderHoje() {
   if (atrasadas.length === 0 && tarefasHoje.length === 0) {
     const p = document.createElement("div");
     p.className = "empty";
-    p.textContent = "Nenhuma tarefa para hoje. Use a aba Chat para adicionar algo.";
+    p.textContent = "Nenhuma tarefa para hoje. Diga o que precisa fazer abaixo.";
     frag.appendChild(p);
   }
+
+  frag.appendChild(renderQuickAddBar());
 
   return frag;
 }
 
 function renderChat() {
   const frag = document.createDocumentFragment();
+
+  const title = document.createElement("div");
+  title.innerHTML = `<div class="page-title">Assistente</div><div class="page-subtitle">Interpreta e confirma antes de agendar</div>`;
+  frag.appendChild(title);
 
   const scroll = document.createElement("div");
   scroll.className = "chat-scroll";
@@ -662,23 +793,41 @@ function renderChat() {
       card.className = "task-card-mini";
       const lowConf = typeof msg.taskCard.confianca === "number" && msg.taskCard.confianca < 0.6;
       card.innerHTML = `
+        <div class="head"><span class="check">✓</span><span class="lbl">Tarefa criada</span></div>
         <div class="title">${escapeHtml(msg.taskCard.title)}</div>
-        <div class="meta">
-          <span>${fmtDate(msg.taskCard.due_at)}</span>
-          <span class="badge">${cat.label}</span>
-          <span class="badge ${msg.taskCard.priority === "high" ? "high" : ""}">${PRIO_LABEL[msg.taskCard.priority] || msg.taskCard.priority}</span>
-          ${lowConf ? `<span class="badge low-conf">confira os detalhes</span>` : ""}
+        <div class="chips">
+          <span class="chip-tag">${fmtDate(msg.taskCard.due_at)}</span>
+          <span class="chip-tag">${cat.label}</span>
+          <span class="chip-tag">${PRIO_LABEL[msg.taskCard.priority] || msg.taskCard.priority}</span>
+          ${lowConf ? `<span class="badge-low-conf">confira os detalhes</span>` : ""}
         </div>
       `;
+      const actionsRow = document.createElement("div");
+      actionsRow.className = "actions-row";
       const actions = document.createElement("div");
       actions.className = "actions";
       const undoBtn = document.createElement("button");
-      undoBtn.className = "undo-btn" + (msg.undone ? " undone" : "");
+      undoBtn.className = "btn-pill undo" + (msg.undone ? " undone" : "");
       undoBtn.textContent = msg.undone ? "Desfeita" : "Desfazer";
       undoBtn.disabled = !!msg.undone;
       undoBtn.onclick = () => desfazerTarefa(msg.taskCard.id, i);
       actions.appendChild(undoBtn);
-      card.appendChild(actions);
+      if (msg.taskCard.google_event_link) {
+        const viewBtn = document.createElement("a");
+        viewBtn.className = "btn-pill view";
+        viewBtn.textContent = "Ver tarefa";
+        viewBtn.href = msg.taskCard.google_event_link;
+        viewBtn.target = "_blank";
+        actions.appendChild(viewBtn);
+      }
+      actionsRow.appendChild(actions);
+      if (typeof msg.taskCard.confianca === "number") {
+        const conf = document.createElement("span");
+        conf.className = "confidence-note";
+        conf.textContent = `confiança ${msg.taskCard.confianca.toFixed(2)}`;
+        actionsRow.appendChild(conf);
+      }
+      card.appendChild(actionsRow);
       scroll.appendChild(card);
     }
   });
@@ -697,11 +846,34 @@ function renderChat() {
 
   frag.appendChild(scroll);
 
+  const suggestRow = document.createElement("div");
+  suggestRow.className = "suggest-row";
+  ["Terça 9h dentista", "Adiar para 11h", "O que ficou pendente?"].forEach((s) => {
+    const chip = document.createElement("button");
+    chip.className = "suggest-chip";
+    chip.textContent = s;
+    chip.onclick = () => { if (!state.submitting) enviarTarefa(s); };
+    suggestRow.appendChild(chip);
+  });
+  frag.appendChild(suggestRow);
+
   const inputRow = document.createElement("div");
   inputRow.className = "chat-input-row";
   const input = document.createElement("input");
-  input.placeholder = "Ex: amanhã tenho dentista às 17h";
+  input.placeholder = "Mensagem";
   input.autocomplete = "off";
+  const submit = () => {
+    const texto = input.value.trim();
+    if (!texto || state.submitting) return;
+    input.value = "";
+    enviarTarefa(texto);
+  };
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+  const sendBtn = document.createElement("button");
+  sendBtn.className = "send-btn";
+  sendBtn.textContent = "↑";
+  sendBtn.disabled = state.submitting;
+  sendBtn.onclick = submit;
   const micBtn = document.createElement("button");
   micBtn.className = "mic-btn" + (state.taskListening ? " listening" : "");
   micBtn.title = "Adicionar tarefa por voz";
@@ -714,21 +886,9 @@ function renderChat() {
       enviarTarefa(texto);
     });
   };
-  const sendBtn = document.createElement("button");
-  sendBtn.className = "btn-primary";
-  sendBtn.textContent = state.submitting ? "..." : "Enviar";
-  sendBtn.disabled = state.submitting;
-  const submit = () => {
-    const texto = input.value.trim();
-    if (!texto || state.submitting) return;
-    input.value = "";
-    enviarTarefa(texto);
-  };
-  sendBtn.onclick = submit;
-  input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
   inputRow.appendChild(input);
-  inputRow.appendChild(micBtn);
   inputRow.appendChild(sendBtn);
+  inputRow.appendChild(micBtn);
   frag.appendChild(inputRow);
 
   return frag;
@@ -737,12 +897,24 @@ function renderChat() {
 function renderAgenda() {
   const frag = document.createDocumentFragment();
 
+  const title = document.createElement("div");
+  title.className = "page-title";
+  title.textContent = "Agenda";
+  title.style.marginBottom = "14px";
+  frag.appendChild(title);
+
   const filterRow = document.createElement("div");
   filterRow.className = "filter-row";
-  [["todas", "Todas"], ["work", "Trabalho"], ["home", "Casa"], ["personal", "Pessoal"]].forEach(([key, label]) => {
+  const opts = [
+    ["todas", "Tudo", null],
+    ["work", "Trabalho", "var(--work)"],
+    ["home", "Casa", "var(--home)"],
+    ["personal", "Pessoal", "var(--personal)"],
+  ];
+  opts.forEach(([key, label, color]) => {
     const chip = document.createElement("button");
     chip.className = "filter-chip" + (state.agendaFilter === key ? " active" : "");
-    chip.textContent = label;
+    chip.innerHTML = (color ? `<span class="filter-dot" style="background:${color}"></span>` : "") + label;
     chip.onclick = () => setState({ agendaFilter: key });
     filterRow.appendChild(chip);
   });
@@ -763,25 +935,39 @@ function renderAgenda() {
 
   let ultimoDia = null;
   let grupoAtual = [];
-  const flush = () => {
+  const flush = (label, dateStr) => {
     if (!grupoAtual.length) return;
     const h = document.createElement("div");
-    h.className = "section-header";
-    h.innerHTML = `${ultimoDia} <span class="count">${grupoAtual.length}</span>`;
+    h.className = "section-header neutral";
+    h.innerHTML = `<span style="color:var(--text);font-weight:700;text-transform:none;font-family:inherit;font-size:13.5px">${label}</span> <span class="mono" style="font-size:11px">${dateStr}</span><span class="count" style="margin-left:auto">${grupoAtual.length} ${grupoAtual.length === 1 ? "tarefa" : "tarefas"}</span>`;
     frag.appendChild(h);
-    grupoAtual.forEach((t) => frag.appendChild(renderTaskRow(t)));
+    grupoAtual.forEach((t) => {
+      const cat = CATS[t.category] || CATS.personal;
+      const row = document.createElement("div");
+      row.className = "agenda-row";
+      row.innerHTML = `
+        <span class="time">${new Date(t.due_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" })}</span>
+        <span class="bar" style="background:${cat.color}"></span>
+        <div class="body">
+          <div class="title">${escapeHtml(t.title)}</div>
+          <div class="sub">${cat.label} · ${PRIO_LABEL[t.priority] || t.priority}</div>
+        </div>
+      `;
+      frag.appendChild(row);
+    });
     grupoAtual = [];
   };
 
   tarefas.forEach((t) => {
-    const rotulo = dayLabelSP(new Date(t.due_at));
+    const d = new Date(t.due_at);
+    const rotulo = dayLabelSP(d);
     if (rotulo !== ultimoDia) {
-      flush();
+      flush(ultimoDia, ultimoDia ? dateNumLabelSP(new Date(tarefas.find((x) => dayLabelSP(new Date(x.due_at)) === ultimoDia).due_at)) : "");
       ultimoDia = rotulo;
     }
     grupoAtual.push(t);
   });
-  flush();
+  flush(ultimoDia, dateNumLabelSP(new Date(grupoAtual[0].due_at)));
 
   return frag;
 }
@@ -789,13 +975,12 @@ function renderAgenda() {
 function filtrarHistorico(history, filtro) {
   if (filtro === "tudo") return history;
   const agora = new Date();
-  const limiteDias = filtro === "hoje" ? 0 : 6; // "semana" = hoje + 6 dias anteriores
+  const limiteDias = filtro === "hoje" ? 0 : 6;
   const inicio = new Date(startOfDaySP(agora).getTime() - limiteDias * 86400000);
   return history.filter((h) => new Date(h.created_at) >= inicio);
 }
 
 function filtrarPorIntervalo(history, dataInicio, dataFim) {
-  // dataInicio/dataFim no formato YYYY-MM-DD, interpretados como dias no fuso America/Sao_Paulo.
   const inicio = new Date(`${dataInicio}T00:00:00-03:00`);
   const fim = new Date(`${dataFim}T23:59:59-03:00`);
   return history.filter((h) => {
@@ -804,8 +989,20 @@ function filtrarPorIntervalo(history, dataInicio, dataFim) {
   });
 }
 
+const ACTION_DOT_COLOR = {
+  criada: "var(--work)",
+  concluida: "var(--home)",
+  remarcada: "#d29922",
+  desfeita: "var(--rust)",
+  excluida: "var(--rust)",
+};
+
 function renderHistory() {
   const frag = document.createDocumentFragment();
+
+  const title = document.createElement("div");
+  title.innerHTML = `<div class="page-title">Histórico</div><div class="page-subtitle">Registro de eventos e resumos fechados</div>`;
+  frag.appendChild(title);
 
   const searchRow = document.createElement("div");
   searchRow.className = "search-row";
@@ -847,6 +1044,17 @@ function renderHistory() {
     chip.appendChild(clearBtn);
     frag.appendChild(chip);
   } else {
+    const suggestRow = document.createElement("div");
+    suggestRow.className = "suggest-row";
+    ["O que eu fiz ontem?", "Quais ficaram pendentes?", "Como foi a semana?"].forEach((s) => {
+      const chip = document.createElement("button");
+      chip.className = "suggest-chip";
+      chip.textContent = s;
+      chip.onclick = () => buscarPeriodoPorPergunta(s);
+      suggestRow.appendChild(chip);
+    });
+    frag.appendChild(suggestRow);
+
     const filterRow = document.createElement("div");
     filterRow.className = "filter-row";
     [["hoje", "Hoje"], ["semana", "Esta semana"], ["tudo", "Tudo"]].forEach(([key, label]) => {
@@ -871,79 +1079,106 @@ function renderHistory() {
     return frag;
   }
 
-  const card = document.createElement("div");
-  card.className = "card";
-  let ultimoDia = null;
+  const grupos = new Map();
   itens.forEach((h) => {
-    const data = new Date(h.created_at);
-    const rotuloDia = dayLabelSP(data);
-    if (rotuloDia !== ultimoDia) {
-      const header = document.createElement("div");
-      header.className = "history-day-header";
-      header.textContent = rotuloDia;
-      card.appendChild(header);
-      ultimoDia = rotuloDia;
-    }
-    const item = document.createElement("div");
-    item.className = "history-item";
-    const hora = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
-    const titulo = h.details?.titulo || h.details?.tarefa?.titulo || h.details?.tarefa?.title || "";
-    const acaoLabel = { criada: "Criada", concluida: "Concluída", remarcada: "Remarcada", excluida: "Excluída", desfeita: "Desfeita" }[h.action] || h.action;
-    item.innerHTML = `<div class="when">${hora}</div><div class="what"><strong>${acaoLabel}</strong>${titulo ? ": " + escapeHtml(titulo) : ""}</div>`;
-    card.appendChild(item);
+    const d = new Date(h.created_at);
+    const key = startOfDaySP(d).toISOString();
+    if (!grupos.has(key)) grupos.set(key, { date: d, items: [] });
+    grupos.get(key).items.push(h);
   });
-  frag.appendChild(card);
+
+  Array.from(grupos.values()).forEach(({ date, items }) => {
+    const card = document.createElement("div");
+    card.className = "history-day-card";
+    const concluidas = items.filter((h) => h.action === "concluida").length;
+    const criadas = items.filter((h) => h.action === "criada").length;
+    const total = criadas || items.length;
+    const rotulo = dayLabelSP(date);
+    const diaSemana = date.toLocaleDateString("pt-BR", { weekday: "long", timeZone: "America/Sao_Paulo" });
+    const label = rotulo === "Hoje" || rotulo === "Ontem" || rotulo === "Amanhã" ? rotulo : diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
+    let head = `<div class="history-day-head"><span class="day">${label} <span class="date">· ${dateNumLabelSP(date)}</span></span>`;
+    if (total > 0) head += `<span class="ratio">${concluidas}/${total}</span>`;
+    head += `</div>`;
+    card.innerHTML = head;
+
+    items.slice().reverse().forEach((h) => {
+      const hora = new Date(h.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
+      const titulo = h.details?.titulo || h.details?.tarefa?.titulo || h.details?.tarefa?.title || "";
+      const acaoLabel = { criada: "Criada", concluida: "Concluída", remarcada: "Remarcada", excluida: "Excluída", desfeita: "Desfeita" }[h.action] || h.action;
+      const cor = ACTION_DOT_COLOR[h.action] || "var(--muted)";
+      const ev = document.createElement("div");
+      ev.className = "history-event";
+      ev.innerHTML = `<span class="when">${hora}</span><span class="dot" style="background:${cor}"></span><span class="what"><strong>${acaoLabel}</strong>${titulo ? ": " + escapeHtml(titulo) : ""}</span>`;
+      card.appendChild(ev);
+    });
+
+    frag.appendChild(card);
+  });
+
   return frag;
 }
 
 function renderSettings() {
   const frag = document.createDocumentFragment();
 
-  const accountCard = document.createElement("div");
-  accountCard.className = "card";
-  accountCard.innerHTML = `<div style="margin-bottom:12px;font-size:14px;color:var(--muted)">Conectado como<br><strong style="color:var(--text)">${escapeHtml(state.session.user.email)}</strong></div>`;
-  const logoutBtn = document.createElement("button");
-  logoutBtn.className = "btn-secondary";
-  logoutBtn.textContent = "Sair da conta";
-  logoutBtn.onclick = handleLogout;
-  accountCard.appendChild(logoutBtn);
-  frag.appendChild(accountCard);
+  const title = document.createElement("div");
+  title.className = "page-title";
+  title.textContent = "Ajustes";
+  title.style.marginBottom = "16px";
+  frag.appendChild(title);
 
-  const prefsCard = document.createElement("div");
-  prefsCard.className = "card";
-  prefsCard.innerHTML = `
-    <div class="settings-row"><span class="label">Resumo diário</span><span class="value">ao abrir o app</span></div>
-    <div class="settings-row"><span class="label">Notificações</span><span class="value">via Google Calendar</span></div>
-    <div class="settings-row"><span class="label">IA de interpretação</span><span class="value">Claude (Anthropic)</span></div>
+  const lbl1 = document.createElement("div");
+  lbl1.className = "settings-section-label";
+  lbl1.textContent = "Assistente & notificações";
+  frag.appendChild(lbl1);
+
+  const card1 = document.createElement("div");
+  card1.className = "settings-card";
+  card1.innerHTML = `
+    <div class="settings-row"><div><div class="label">Resumo diário</div><div class="sub">gerado por IA ao abrir o app</div></div><span class="value">ativo</span></div>
+    <div class="settings-row"><div><div class="label">Notificações</div><div class="sub">lembretes padrão do Google Calendar, não são push do navegador</div></div></div>
+    <div class="settings-row"><div><div class="label">IA de interpretação</div><div class="sub">extrai título, data, hora e prioridade</div></div><span class="value">Claude</span></div>
   `;
-  frag.appendChild(prefsCard);
+  frag.appendChild(card1);
 
-  const noteCard = document.createElement("div");
-  noteCard.className = "card";
-  noteCard.innerHTML = `<div style="font-size:13px;color:var(--muted);line-height:1.5">
-    As notificações de tarefas usam os lembretes padrão do Google Calendar (não são notificações push do app).
-    Certifique-se de que sua conta Google esteja conectada para recebê-las.
-  </div>`;
-  frag.appendChild(noteCard);
+  const lbl2 = document.createElement("div");
+  lbl2.className = "settings-section-label";
+  lbl2.textContent = "Conta";
+  frag.appendChild(lbl2);
 
-  const dangerCard = document.createElement("div");
-  dangerCard.className = "card";
-  dangerCard.innerHTML = `<div class="danger-zone-title">Zona de risco</div>`;
+  const card2 = document.createElement("div");
+  card2.className = "settings-card";
+  card2.innerHTML = `<div class="settings-row"><span class="label">E-mail</span><span class="value">${escapeHtml(state.session.user.email)}</span></div>`;
+  const logoutRow = document.createElement("div");
+  logoutRow.className = "settings-row link";
+  logoutRow.innerHTML = `<span class="label">Sair da conta</span>`;
+  logoutRow.onclick = handleLogout;
+  card2.appendChild(logoutRow);
+  frag.appendChild(card2);
+
+  const lbl3 = document.createElement("div");
+  lbl3.className = "settings-section-label";
+  lbl3.textContent = "Zona de risco";
+  frag.appendChild(lbl3);
+
+  const card3 = document.createElement("div");
+  card3.className = "settings-card";
+  card3.style.padding = "15px";
   if (!state.confirmDeleteAccount) {
+    card3.innerHTML = `<div class="danger-warning">Apaga permanentemente suas tarefas, histórico e a conexão com o Google.</div>`;
     const delBtn = document.createElement("button");
-    delBtn.className = "btn-danger";
+    delBtn.className = "btn-secondary";
+    delBtn.style.color = "var(--rust)";
     delBtn.textContent = "Excluir conta e dados";
     delBtn.onclick = () => setState({ confirmDeleteAccount: true });
-    dangerCard.appendChild(delBtn);
+    card3.appendChild(delBtn);
   } else {
-    const warn = document.createElement("div");
-    warn.style.cssText = "font-size:13px;color:var(--muted);margin-bottom:10px;";
-    warn.textContent = "Isso apaga permanentemente suas tarefas, histórico e conexão com o Google. Não pode ser desfeito.";
-    dangerCard.appendChild(warn);
+    card3.innerHTML = `<div class="danger-warning">Tem certeza? Essa ação não pode ser desfeita.</div>`;
     const row = document.createElement("div");
     row.style.cssText = "display:flex;gap:8px;";
     const confirmBtn = document.createElement("button");
-    confirmBtn.className = "btn-danger";
+    confirmBtn.className = "btn-secondary";
+    confirmBtn.style.color = "var(--rust)";
     confirmBtn.textContent = state.deletingAccount ? "Excluindo..." : "Confirmar exclusão";
     confirmBtn.disabled = state.deletingAccount;
     confirmBtn.onclick = excluirConta;
@@ -954,57 +1189,58 @@ function renderSettings() {
     cancelBtn.onclick = () => setState({ confirmDeleteAccount: false });
     row.appendChild(confirmBtn);
     row.appendChild(cancelBtn);
-    dangerCard.appendChild(row);
+    card3.appendChild(row);
   }
-  frag.appendChild(dangerCard);
+  frag.appendChild(card3);
 
   return frag;
 }
 
-function renderApp() {
-  const frag = document.createDocumentFragment();
-
-  const header = document.createElement("header");
-  header.className = "app-header";
-  header.innerHTML = `<h1>Assistente Pessoal</h1>`;
-  frag.appendChild(header);
-
-  const tabs = document.createElement("div");
-  tabs.className = "tabs";
-  TABS.forEach(([key, label]) => {
+function renderTabBar() {
+  const wrap = document.createElement("div");
+  wrap.className = "tabbar-wrap";
+  const inner = document.createElement("div");
+  inner.className = "tabbar-inner";
+  const bar = document.createElement("div");
+  bar.className = "tabbar";
+  TABS.forEach(([key, label, icon]) => {
     const b = document.createElement("button");
-    b.className = "tab" + (state.tab === key ? " active" : "");
-    b.textContent = label;
+    b.className = "tab-btn" + (state.tab === key ? " active" : "");
+    b.innerHTML = `${icon}<span class="tab-label">${label}</span>`;
     b.onclick = () => {
       setState({ tab: key });
       if (key === "history") loadHistory();
       if (key === "hoje" && !state.resumo && !state.resumoLoading) loadResumo();
     };
-    tabs.appendChild(b);
+    bar.appendChild(b);
   });
-  frag.appendChild(tabs);
+  inner.appendChild(bar);
+  wrap.appendChild(inner);
+  return wrap;
+}
+
+function renderApp() {
+  const wrap = document.createDocumentFragment();
 
   const content = document.createElement("div");
+  content.className = "content";
   if (state.tab === "hoje") content.appendChild(renderHoje());
   else if (state.tab === "chat") content.appendChild(renderChat());
   else if (state.tab === "agenda") content.appendChild(renderAgenda());
   else if (state.tab === "history") content.appendChild(renderHistory());
   else content.appendChild(renderSettings());
-  frag.appendChild(content);
+  wrap.appendChild(content);
 
-  const footer = document.createElement("div");
-  footer.className = "footer-note";
-  footer.textContent = "Suas tarefas são salvas na nuvem e sincronizadas com o Google Calendar.";
-  frag.appendChild(footer);
+  wrap.appendChild(renderTabBar());
 
   if (state.toast) {
     const t = document.createElement("div");
     t.className = "toast";
     t.textContent = state.toast;
-    frag.appendChild(t);
+    wrap.appendChild(t);
   }
 
-  return frag;
+  return wrap;
 }
 
 function render() {
