@@ -31,7 +31,7 @@
     color: var(--text);
   }
   .phone { max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--bg); position: relative; display: flex; flex-direction: column; }
-  .content { flex: 1; padding: 20px 18px 12px; padding-bottom: 190px; }
+  .content { flex: 1; padding: 20px 18px 12px; padding-bottom: 205px; }
   button { font: inherit; cursor: pointer; border: none; background: none; }
   a { color: inherit; }
 
@@ -109,6 +109,13 @@
   .cal-tag { font-size: 11px; color: var(--work); }
 
   .empty { text-align: center; color: var(--muted); padding: 40px 16px; font-size: 14px; }
+
+  /* Fixed input bar (Hoje quick-add / Chat message), pinned above the tab bar */
+  .input-bar-wrap {
+    position: fixed; left: 0; right: 0; display: flex; justify-content: center;
+    background: var(--bg); z-index: 15;
+  }
+  .input-bar-inner { width: 100%; max-width: 480px; padding: 10px 18px; }
 
   /* Bottom quick-add bar (Hoje) */
   .quick-add-bar { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
@@ -759,8 +766,6 @@ function renderHoje() {
     frag.appendChild(p);
   }
 
-  frag.appendChild(renderQuickAddBar());
-
   return frag;
 }
 
@@ -857,6 +862,10 @@ function renderChat() {
   });
   frag.appendChild(suggestRow);
 
+  return frag;
+}
+
+function renderChatInputBar() {
   const inputRow = document.createElement("div");
   inputRow.className = "chat-input-row";
   const input = document.createElement("input");
@@ -889,9 +898,7 @@ function renderChat() {
   inputRow.appendChild(input);
   inputRow.appendChild(sendBtn);
   inputRow.appendChild(micBtn);
-  frag.appendChild(inputRow);
-
-  return frag;
+  return inputRow;
 }
 
 function renderAgenda() {
@@ -1219,6 +1226,17 @@ function renderTabBar() {
   return wrap;
 }
 
+function renderInputBar() {
+  if (state.tab !== "hoje" && state.tab !== "chat") return null;
+  const wrap = document.createElement("div");
+  wrap.className = "input-bar-wrap";
+  const inner = document.createElement("div");
+  inner.className = "input-bar-inner";
+  inner.appendChild(state.tab === "hoje" ? renderQuickAddBar() : renderChatInputBar());
+  wrap.appendChild(inner);
+  return wrap;
+}
+
 function renderApp() {
   const wrap = document.createDocumentFragment();
 
@@ -1230,6 +1248,9 @@ function renderApp() {
   else if (state.tab === "history") content.appendChild(renderHistory());
   else content.appendChild(renderSettings());
   wrap.appendChild(content);
+
+  const inputBar = renderInputBar();
+  if (inputBar) wrap.appendChild(inputBar);
 
   wrap.appendChild(renderTabBar());
 
@@ -1249,6 +1270,11 @@ function render() {
     app.appendChild(renderLogin());
   } else {
     app.appendChild(renderApp());
+    const tabbarEl = app.querySelector(".tabbar-wrap");
+    const inputBarEl = app.querySelector(".input-bar-wrap");
+    if (tabbarEl && inputBarEl) {
+      inputBarEl.style.bottom = tabbarEl.offsetHeight + "px";
+    }
   }
 }
 
