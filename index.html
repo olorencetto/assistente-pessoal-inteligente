@@ -140,6 +140,9 @@
   .task-card-mini .head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
   .task-card-mini .head .check { color: var(--home); font-size: 14px; }
   .task-card-mini .head .lbl { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--home); }
+  .task-card-mini.cancelled .head .check { color: var(--rust); }
+  .task-card-mini.cancelled .head .lbl { color: var(--rust); }
+  .task-card-mini.cancelled .title { text-decoration: line-through; color: var(--muted); }
   .task-card-mini .title { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
   .task-card-mini .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
   .chip-tag { font-size: 12px; background: var(--pill-bg); color: var(--text); padding: 3px 10px; border-radius: 999px; }
@@ -426,23 +429,39 @@ async function enviarTarefa(texto) {
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || "Erro ao processar tarefa");
 
-    let calText = "";
-    if (data.calendar_status === "criado") calText = "Evento adicionado ao Google Calendar.";
-    else if (data.calendar_status === "erro") calText = "Não consegui criar o evento no Calendar.";
-
-    const assistantMsg = {
-      role: "assistant",
-      text: calText || "Tarefa criada.",
-      taskCard: {
-        id: data.tarefa.id,
-        title: data.tarefa.title,
-        due_at: data.tarefa.due_at,
-        category: data.tarefa.category,
-        priority: data.tarefa.priority,
-        confianca: data.confianca,
-        google_event_link: data.google_event_link,
-      },
-    };
+    let assistantMsg;
+    if (data.tipo === "cancelada") {
+      assistantMsg = {
+        role: "assistant",
+        text: "Tarefa cancelada.",
+        cancelCard: {
+          title: data.tarefa.title,
+          due_at: data.tarefa.due_at,
+          category: data.tarefa.category,
+          priority: data.tarefa.priority,
+          confianca: data.confianca,
+        },
+      };
+    } else if (data.tipo === "cancelamento_nao_encontrado") {
+      assistantMsg = { role: "assistant", text: data.mensagem || "Não encontrei essa tarefa." };
+    } else {
+      let calText = "";
+      if (data.calendar_status === "criado") calText = "Evento adicionado ao Google Calendar.";
+      else if (data.calendar_status === "erro") calText = "Não consegui criar o evento no Calendar.";
+      assistantMsg = {
+        role: "assistant",
+        text: calText || "Tarefa criada.",
+        taskCard: {
+          id: data.tarefa.id,
+          title: data.tarefa.title,
+          due_at: data.tarefa.due_at,
+          category: data.tarefa.category,
+          priority: data.tarefa.priority,
+          confianca: data.confianca,
+          google_event_link: data.google_event_link,
+        },
+      };
+    }
     setState({ submitting: false, chatMessages: [...state.chatMessages, assistantMsg] });
     await loadTasks();
     loadResumo();
@@ -833,6 +852,31 @@ function renderChat() {
         actionsRow.appendChild(conf);
       }
       card.appendChild(actionsRow);
+      scroll.appendChild(card);
+    }
+
+    if (msg.cancelCard) {
+      const cat = CATS[msg.cancelCard.category] || CATS.personal;
+      const card = document.createElement("div");
+      card.className = "task-card-mini cancelled";
+      card.innerHTML = `
+        <div class="head"><span class="check">✕</span><span class="lbl">Tarefa cancelada</span></div>
+        <div class="title">${escapeHtml(msg.cancelCard.title)}</div>
+        <div class="chips">
+          <span class="chip-tag">${fmtDate(msg.cancelCard.due_at)}</span>
+          <span class="chip-tag">${cat.label}</span>
+          <span class="chip-tag">${PRIO_LABEL[msg.cancelCard.priority] || msg.cancelCard.priority}</span>
+        </div>
+      `;
+      if (typeof msg.cancelCard.confianca === "number") {
+        const actionsRow = document.createElement("div");
+        actionsRow.className = "actions-row";
+        const conf = document.createElement("span");
+        conf.className = "confidence-note";
+        conf.textContent = `confiança ${msg.cancelCard.confianca.toFixed(2)}`;
+        actionsRow.appendChild(conf);
+        card.appendChild(actionsRow);
+      }
       scroll.appendChild(card);
     }
   });
