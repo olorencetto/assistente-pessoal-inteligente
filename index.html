@@ -748,22 +748,40 @@ function renderQuickAddBar() {
     if (!texto || state.submitting) return;
     input.value = "";
     enviarTarefa(texto);
+    updateActionBtnMode();
   };
   input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
-  const micBtn = document.createElement("button");
-  micBtn.className = "mic-btn" + (state.taskListening ? " listening" : "");
-  micBtn.title = "Adicionar tarefa por voz";
-  micBtn.type = "button";
-  micBtn.textContent = state.taskListening ? "●" : "🎤";
-  micBtn.disabled = state.submitting;
-  micBtn.onclick = () => {
-    iniciarEscutaTarefa((texto) => {
-      if (!texto || state.submitting) return;
-      enviarTarefa(texto);
-    });
+
+  const actionBtn = document.createElement("button");
+  actionBtn.type = "button";
+  actionBtn.disabled = state.submitting;
+
+  const setSendMode = () => {
+    actionBtn.className = "send-btn";
+    actionBtn.title = "Enviar mensagem";
+    actionBtn.textContent = "↑";
+    actionBtn.onclick = submit;
   };
+  const setMicMode = () => {
+    actionBtn.className = "mic-btn" + (state.taskListening ? " listening" : "");
+    actionBtn.title = "Adicionar tarefa por voz";
+    actionBtn.textContent = state.taskListening ? "●" : "🎤";
+    actionBtn.onclick = () => {
+      iniciarEscutaTarefa((texto) => {
+        if (!texto || state.submitting) return;
+        enviarTarefa(texto);
+      });
+    };
+  };
+  const updateActionBtnMode = () => {
+    if (input.value.trim().length > 0) setSendMode();
+    else setMicMode();
+  };
+  input.addEventListener("input", updateActionBtnMode);
+  updateActionBtnMode();
+
   bar.appendChild(input);
-  bar.appendChild(micBtn);
+  bar.appendChild(actionBtn);
   return bar;
 }
 
