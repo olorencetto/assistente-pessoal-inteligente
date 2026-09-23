@@ -666,6 +666,18 @@ function escapeHtml(s) {
   return d.innerHTML;
 }
 
+function formatLembrete(minutos) {
+  if (minutos === null || minutos === undefined) return "Padrão do Google";
+  if (minutos <= 0) return "Sem lembrete";
+  if (minutos < 60) return `${minutos} min antes`;
+  if (minutos < 1440) {
+    const h = Math.round(minutos / 60);
+    return `${h} ${h === 1 ? "hora" : "horas"} antes`;
+  }
+  const d = Math.round(minutos / 1440);
+  return `${d} ${d === 1 ? "dia" : "dias"} antes`;
+}
+
 function renderTaskRow(task, opts = {}) {
   const cat = CATS[task.category] || CATS.personal;
   const overdue = !!opts.overdue;
@@ -1390,11 +1402,14 @@ function renderTaskDetailModal() {
   });
   const horaFmt = new Date(task.due_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
 
+  const lembreteLabel = formatLembrete(task.reminder_minutes);
+
   const rows = document.createElement("div");
   rows.innerHTML = `
     <div class="modal-meta-row"><span class="lbl">Quando</span><span>${dataFmt.charAt(0).toUpperCase() + dataFmt.slice(1)} · ${horaFmt}</span></div>
     <div class="modal-meta-row"><span class="lbl">Categoria</span><span class="cat-dot" style="background:${cat.color}"></span><span>${cat.label}</span></div>
     <div class="modal-meta-row"><span class="lbl">Prioridade</span><span>${PRIO_LABEL[task.priority] || task.priority}</span></div>
+    <div class="modal-meta-row"><span class="lbl">Lembrete</span><span>${lembreteLabel}</span></div>
     <div class="modal-meta-row"><span class="lbl">Calendar</span><span>${task.google_event_id ? "Sincronizada com o Google Calendar" : "Não sincronizada"}</span></div>
   `;
   sheet.appendChild(rows);
